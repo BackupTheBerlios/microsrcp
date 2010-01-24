@@ -8,9 +8,6 @@
 // that is available at the world-wide-web at
 // http://www.gnu.org/licenses/gpl.txt
 //
-//
-// see new
-//
 //-----------------------------------------------------------------
 //
 // file:      organizer.c
@@ -44,15 +41,8 @@
 //                             read dcc_pom_repeat, dcc_func_repeat and speed from eeprom
 //            2008-07-21 V0.18 addr_inquiry_locobuffer added,
 //            2008-08-01 V0.19 changed: find_in_queue (now only for speed commands)
-//                             organizer_state (as struct) added
-//            2008-08-03 V0.20 unified return values for do_...
-//                             added slot (=owner) to calling parameter list of loco functions
-//                             repeat for accessory and PoM changed
-//            2008-08-21 V0.20 added manual flags for turnout to report handover
-//                             added manual flags for loco to fullfill IB report requirements
-//            2008-08-24       bugfix in format transfer.
-//            2008-09-16       Functions F13-F28 also in refresh; bugfix: changed refresh alg.
-//                             return code for virtual decoders changed
+//                             organizer_halt_state added
+//            2008-08-03 V0.20 unified return values
 //            2009-06-23 V0.21 added build_dcc_fast_clock();
 //			  2010-01-24 Angepasst an Arduinoboard mit ATmega328P, Marcel Bernet
 //
@@ -114,9 +104,10 @@
 #include <string.h>
 
 #include "config.h"                // general structures and definitions
-#include "dccout.h"
-#include "organizer.h" 
 #include "parser.h"
+#include "dccout.h"
+
+#include "organizer.h" 
 
 // mega32:   2kByte SRAM, 1kByte EEPROM
 // mega644:  4kByte SRAM, 2kByte EEPROM
@@ -143,17 +134,11 @@ t_message repeatbuffer[SIZE_REPEATBUFFER];
 
 struct locomem locobuffer[SIZE_LOCOBUFFER];
 
-#if (SIZE_LOCOBUFFER > 254)
-  #error SIZE_LOCOBUFFER too large
-#endif
 
 //-------------------------------------- memory to store turnout positions
 
 #if (SIZE_TURNOUTBUFFER > 0)       // no of Turnouts / 8 (64 = 512 Turnouts)
-unsigned char turnoutbuffer[SIZE_TURNOUTBUFFER];            // positions
-    #if (XPRESSNET_ENABLED == 1)
-        unsigned char turnoutmanual[SIZE_TURNOUTBUFFER];    // operated manually
-    #endif  
+unsigned char turnoutbuffer[SIZE_TURNOUTBUFFER];   
 #endif
 // ---------------------------------------------------------------------
 // predefined messages
@@ -166,18 +151,9 @@ t_message DCC_BC_Stop  = {1,  {{ 2,  is_stop}}, {0x00, 0x71}};    // Broadcast M
 t_message DCC_BC_Brake = {1,  {{ 2,  is_stop}}, {0x00, 0x70}};    // Broadcast Slow down
                                                                     // if S=0: slow down
 
-t_organizer_state organizer_state =
-  { 0,                                  // halted
-    0,                                  // lok_stolen_by_pc
-    0,                                  // lok_stolen_by_handheld
-    0,                                  // lok_operated_by_handheld
-    0,                                  // turnout_by_handheld
-  };  
-
-unsigned int virtual_decoder_offset;    // if > 0: addresses from this location on map to dmx
-                                        // use a large number to a disable virtiul decoders
-                                        // this value is read from eeprom
-                                        // see definition of eeprom in config.c and config.h
+unsigned char organizer_halt_state = 0; // if 0: no halt
+                                        // if 1: send STOP (speed = 0)
+                                        // if 2 send BRAKE (speed = emergency stop)
 
 unsigned char dcc_acc_repeat;           // dcc accessory commands are repeated this time
                                         // this value is read from eeprom
@@ -190,6 +166,10 @@ unsigned char dcc_speed_repeat;         // dcc speed commands are repeated this 
 
 unsigned char dcc_func_repeat;          // dcc func commands are repeated this time
                                         // this value is read from eeprom
+
+t_format dcc_default_format;            // dcc default: 0=DCC14, 2=DCC28, 3=DCC128
+                                        // this value is read from eeprom
+
 
 //-------------------------------------------------------------------------------------------------
 
@@ -517,33 +497,6 @@ void build_function_7a_grp3(int nr, unsigned char func, t_message *new_message)
     new_message->dcc[1] = 0b10100000 | (func & 0x0F);
   }
 
-#if (DCC_F13_F28 == 1)
-void build_function_7a_grp4(int nr, unsigned char func, t_message *new_message)
-  {
-    // Message: 11AAAAAA AAAAAAAA 11011110 FFFFFFFF
-    // FFFFFFFF => F20 ... F13
-
-    new_message->repeat = dcc_func_repeat;
-    new_message->type = is_void;
-    new_message->size = 3;
-    new_message->dcc[0] = (nr & 0x7F);
-    new_message->dcc[1] = 0b11011110;
-    new_message->dcc[2] = func;
-  }
-
-void build_function_7a_grp5(int nr, unsigned char func, t_message *new_message)
-  {
-    // Message: 11AAAAAA AAAAAAAA 11011111 FFFFFFFF
-    // FFFFFFFF => F28 ... F21
-
-    new_message->repeat = dcc_func_repeat;
-    new_message->type = is_void;
-    new_message->size = 3;
-    new_message->dcc[0] = (nr & 0x7F);
-    new_message->dcc[1] = 0b11011111;
-    new_message->dcc[2] = func;
-  }
-#endif
 
 void build_function_14a_grp1(int nr, unsigned char func, t_message *new_message)
   {
@@ -586,36 +539,6 @@ void build_function_14a_grp3(int nr, unsigned char func, t_message *new_message)
     // build up data: -> 1010FFFF
     new_message->dcc[2] = 0b10100000 | (func & 0x0F);
   }
-
-#if (DCC_F13_F28 == 1)
-void build_function_14a_grp4(int nr, unsigned char func, t_message *new_message)
-  {
-    // Message: 11AAAAAA AAAAAAAA 11011110 FFFFFFFF
-    // FFFFFFFF => F20 ... F13
-
-    new_message->repeat = dcc_func_repeat;
-    new_message->type = is_void;
-    new_message->size = 4;
-    new_message->dcc[0] = 0xC0 | ( (unsigned char)(nr / 256) & 0x3F);
-    new_message->dcc[1] = (char)(nr & 0xFF);
-    new_message->dcc[2] = 0b11011110;
-    new_message->dcc[3] = func;
-  }
-
-void build_function_14a_grp5(int nr, unsigned char func, t_message *new_message)
-  {
-    // Message: 11AAAAAA AAAAAAAA 11011111 FFFFFFFF
-    // FFFFFFFF => F28 ... F21
-
-    new_message->repeat = dcc_func_repeat;
-    new_message->type = is_void;
-    new_message->size = 4;
-    new_message->dcc[0] = 0xC0 | ( (unsigned char)(nr / 256) & 0x3F);
-    new_message->dcc[1] = (char)(nr & 0xFF);
-    new_message->dcc[2] = 0b11011111;
-    new_message->dcc[3] = func;
-  }
-#endif
 
 
 void build_pom_14a(int nr, unsigned int cv, unsigned char data, t_message *new_message)
@@ -740,8 +663,6 @@ void build_dcc_fast_clock(t_fast_clock *my_clock, t_message *new_message)
 //============================================================================
 //
 // purpose:   stores and reload positions of turnouts
-//            in case of Xpressnet we maintain a second bitfield with all
-//            manual operated turnouts.
 //
 // note:      if memory is limited, only the turnouts in this memory are stored
 //            and recovered, all other are reported as 0 (=green).
@@ -752,7 +673,7 @@ void build_dcc_fast_clock(t_fast_clock *my_clock, t_message *new_message)
 
 #if (SIZE_TURNOUTBUFFER > 0) 
 
-void save_turnout(unsigned char slot, unsigned int addr, unsigned char output)
+void save_turnout(unsigned int addr, unsigned char output)
   {
     unsigned int index;
     unsigned char mask;
@@ -762,15 +683,10 @@ void save_turnout(unsigned char slot, unsigned int addr, unsigned char output)
     mask = 1 << mask;
     if (index < SIZE_TURNOUTBUFFER)
       {  
-        if (output)  turnoutbuffer[index] |= mask;
-        else         turnoutbuffer[index] &= ~mask;
-        #if (XPRESSNET_ENABLED == 1)
-            if (slot != 0)
-              {
-                turnoutmanual[index] |= mask;       // mark as operated manually
-                organizer_state.turnout_by_handheld = 1;
-              }
-        #endif
+        if (output)
+            turnoutbuffer[index] |= mask;
+        else
+            turnoutbuffer[index] &= ~mask;
       }
   }
 
@@ -803,63 +719,22 @@ unsigned char recall_turnout_group(unsigned int group_addr)
       }
     return(0);  // as default, if buffer is not large enough
   }
-
-#if (XPRESSNET_ENABLED == 1)
-unsigned char get_number_of_manual_turnout_ops(void)
-  {   
-    unsigned char i, no_trnt_events = 0;
-
-    for (i=0; i<SIZE_TURNOUTBUFFER; i++)            // scan turnoutmanual buffer for any change
-      {
-        if (turnoutmanual[i])
-          {
-            unsigned char j;
-            for (j=1; j!=0; j<<=1)
-              {
-                if (turnoutmanual[i] & j) 
-                  {
-                    no_trnt_events++;               // count changes
-                    if (no_trnt_events == 64) return(no_trnt_events);
-                  }
-              }
-          }
-      }
-    return(no_trnt_events);
-  }
-
-unsigned int recall_manual_turnout(void)
-  {
-    unsigned char i, j, mask;
-    t_data16 trnt_addr;
-
-    for (i=0; i<SIZE_TURNOUTBUFFER; i++)
-      {
-        if (turnoutmanual[i])
-          {
-            mask = 1;
-            for (j=0; j<8; j++)
-              {
-                if (turnoutmanual[i] & mask)
-                  {
-                    turnoutmanual[i] &= ~mask;
-                    trnt_addr.as_uint16 = (i * 8) + j;
-                    if ((turnoutbuffer[i] & mask) != 0)  trnt_addr.as_uint8[1] |= 0x80;  // set color
-                    return(trnt_addr.as_uint16);                // done
-                  }
-                mask <<= 1;
-              }
-          }
-      }
-    return(0);
-  }
-#endif
+ 
 #else  // SIZE_TURNOUTBUFFER
 
-void save_turnout(unsigned char slot, unsigned int addr, unsigned char output)  {  }
-unsigned char recall_turnout(unsigned int addr)  {    return(0);  }
-unsigned char recall_turnout_group(unsigned int group_addr)  {    return(0);  }
-unsigned char get_number_of_manual_turnout_ops(void)  {    return(0);  }
-unsigned int recall_manual_turnout(void);
+void save_turnout(unsigned int addr, unsigned char output)
+  {
+  }
+
+unsigned char recall_turnout(unsigned int addr)
+  {
+    return(0);
+  }
+
+unsigned char recall_turnout_group(unsigned int group_addr)
+  {
+    return(0);
+  }
 
 #endif // SIZE_TURNOUTBUFFER
 
@@ -883,7 +758,53 @@ unsigned int recall_manual_turnout(void);
 //            get_loco_format(unsigned int addr)
 //            store_loco_format(unsigned int addr, t_format format)
 //
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------
+// LOCO FORMATS are stored in EEPROM
+//------------------------------------------------------------------------
+//
+// The default format of OpenDCC is defined in config.h (DCC_DEFAULT_FORMAT)
+// and stored in EEPROM (CV24)
+//
+// Rules: if a loco runs with the default format, it is not stored.
+//        if a loco runs at a different format, the address and the format
+//        is stored in EEPROM as 16 bit value, which is defined as follows:
+//        - upper 2 bits contain the loco format;
+//        - lower 14 bits contain the loco address.
+//        - if entry == 0x0000, the entry is void.
+//  
+// 
+// Up to 64 locos may have different format (ESIZE_LOCO_FORMAT)
+
+// We allocate this storage to a fixed address to have access from the
+// parser with a constant offset to eeprom
+// (parser commands: read and write Special Option)
+//
+
+// EEPROM Interface
+// EEPROM byteweise lesen -> geht schneller
+//
+/// get_loco_format returns the stored loco format, if loco was never
+//  used with a format different from default it is not stored.
+//
+t_format get_loco_format(unsigned int addr)
+  {
+    return(dcc_default_format);     // not found - default format
+  }
+
+//
+// see also: http://www.mikrocontroller.net/articles/AVR-GCC-Tutorial#EEPROM
+// is it default format?
+// -> no:   search loco, if found: replace it
+//          if not found: search empty and store it
+//          if no empty found: error too many locos with extra format -> unhandled - Code 0
+// -> yes:  search loco, if found: clear entry
+
+
+unsigned char store_loco_format(unsigned int addr, t_format format)
+  {
+    return(1);
+  }
+
 // local static var to locobuffer
 
 unsigned char cur_i;             // this locobuffer entry is currently used
@@ -918,60 +839,6 @@ unsigned char last_locobuffer_index(void)
     return lb_index;
   }
 
-#if (XPRESSNET_ENABLED == 1)
-
-unsigned char orgz_old_lok_owner;
-
-unsigned char check_for_stolen_loco(unsigned char slot, unsigned char index)
-  {
-    unsigned char retval = 0;
-
-    if (slot != 0)                                          // possibly stolen by handheld 
-      {
-        if (locobuffer[index].owned_by_pc)                  // stolen from pc
-          {
-            locobuffer[index].owned_by_pc = 0;
-            organizer_state.lok_stolen_by_handheld = 1;
-            locobuffer[index].owner_changed = 1;
-            locobuffer[index].slot = slot;
-            retval = (1 << ORGZ_STOLEN);
-          }
-        else if (locobuffer[index].slot != slot)            // stolen from other handheld, no global flag
-          {
-            orgz_old_lok_owner = locobuffer[index].slot;    // save for notify
-            locobuffer[index].owner_changed = 1;
-            locobuffer[index].slot = slot;
-            retval = (1 << ORGZ_STOLEN);
-          }
-        organizer_state.lok_operated_by_handheld = 1;       // global: lok has been manual operated
-        locobuffer[index].manual_operated = 1;              // local: this lok
-      }
-    else                                                    // possibly stolen by pc
-      {
-        if (!locobuffer[index].owned_by_pc)
-          {
-            locobuffer[index].owned_by_pc = 1;
-            organizer_state.lok_stolen_by_pc = 1;
-            locobuffer[index].owner_changed = 1;
-            retval = (1 << ORGZ_STOLEN);
-          }
-      }
-    return(retval);
-  }
-#endif
-
-//-----------------------------------------------------------------------------------
-// find entry for this addr in locobuffer
-// return:  char: Bit 1 (LB_STOLEN)     1 Falls owner changed
-//          lb_index is updated
-
-unsigned char get_entry(unsigned char slot, unsigned int addr)
-  {
-    unsigned char i, found_i, found_r;
-    unsigned char retval = 0;
-
-    return(retval);
-  }
 
 //-----------------------------------------------------------------------------------
 // neue Addr, neue Speed und neues Format in Locobuffer eintragen
@@ -981,33 +848,66 @@ unsigned char get_entry(unsigned char slot, unsigned int addr)
 //                Bit 1 (LB_STOLEN)     1 Falls owner changed
 // damit kann der Caller den Befehl zum Bremsen in einer anderen queue ablegen.
 
-unsigned char enter_speed_f_to_locobuffer(unsigned char slot, unsigned int addr,
-                                              unsigned char speed, t_format format)  
+unsigned char enter_speed_f_to_locobuffer(unsigned int addr, unsigned char speed, t_format format) 
   {
+    unsigned char i, found_i, found_r;
     unsigned char retval = 0;
 
-    retval = get_entry(slot, addr);
-    
-    if (retval & (1 << ORGZ_NEW))
+    // find same entry
+    for (i=0; i<SIZE_LOCOBUFFER; i++)
       {
-        locobuffer[lb_index].format = format;
-        store_loco_format(addr, format);          // !!! unhandled, if store fails!
-        locobuffer[lb_index].speed = speed;
-        return(retval);
+        if (locobuffer[i].address == addr)
+          {
+            // replace it
+
+            locobuffer[i].address = addr;
+            if (locobuffer[i].format != format)           // got new format -> store it
+              {
+                store_loco_format(addr, format);          // !!! unhandled, if store fails!
+              }
+            locobuffer[i].refresh = 0;
+            if ((speed ^ locobuffer[i].speed) & 0x80) retval = (1 << ORGZ_SLOW_DOWN);      // dir changed
+            if ((speed & 0x7F) < (locobuffer[i].speed & 0x7F)) retval = (1 << ORGZ_SLOW_DOWN);   // brake
+            
+            locobuffer[i].speed = speed;
+            lb_index = i;
+            return(retval);
+         }
       }
-    // same entry
-    if (locobuffer[lb_index].format != format)           // got new format -> store it
+    // does not yet exist -> find either empty entry or replace oldest one
+    // find an empty entry
+    for (i=0; i<SIZE_LOCOBUFFER; i++)
       {
-        locobuffer[lb_index].format = format;                   
-        //store_loco_format(addr, format);          // !!! unhandled, if store fails!
+        if (locobuffer[i].address == 0)
+          {
+            // fill it
+            locobuffer[i].address = addr;
+            locobuffer[i].refresh = 0;
+            locobuffer[i].format = format;
+            store_loco_format(addr, format);          // !!! unhandled, if store fails!
+            locobuffer[i].speed = speed;            
+            lb_index = i;
+            return(retval);
+          }
       }
-    locobuffer[lb_index].refresh = 0;
-    if ((speed ^ locobuffer[lb_index].speed) & 0x80) retval |= (1 << ORGZ_SLOW_DOWN);      // dir changed
-    if ((speed & 0x7F) < (locobuffer[lb_index].speed & 0x7F)) retval |= (1 << ORGZ_SLOW_DOWN);   // brake
-    
-    locobuffer[lb_index].speed = speed;
+    // find oldest entry
+    found_i = 0; found_r = 0;
+    for (i=0; i<SIZE_LOCOBUFFER; i++)
+      {
+        if (locobuffer[i].refresh > found_r)
+          {
+            found_i = i; found_r = locobuffer[i].refresh;
+          }
+      }
+    locobuffer[found_i].address = addr;
+    locobuffer[found_i].refresh = 0;
+    locobuffer[found_i].format = format;
+    store_loco_format(addr, format);         // !!! unhandled, if store fails!
+    locobuffer[found_i].speed = speed;
+    lb_index = found_i;
+    retval = (1 << ORGZ_STOLEN);
     return(retval);
- }
+  }
 
 
 //-----------------------------------------------------------------------------------
@@ -1017,26 +917,62 @@ unsigned char enter_speed_f_to_locobuffer(unsigned char slot, unsigned int addr,
 //                              0 falls neue Speed >= alte Speed.
 // damit kann der Caller den Befehl zum Bremsen in einer anderen queue ablegen.
 
-unsigned char enter_speed_to_locobuffer(unsigned char slot, unsigned int addr,
-                                            unsigned char speed)  
+unsigned char enter_speed_to_locobuffer(unsigned int addr, unsigned char speed)    // returns index where entered
   {
+    unsigned char i, found_i, found_r;
     unsigned char retval = 0;
 
-    retval = get_entry(slot, addr);
-    
-    if (retval & (1 << ORGZ_NEW))
+    // find same entry
+    for (i=0; i<SIZE_LOCOBUFFER; i++)
       {
-        locobuffer[lb_index].speed = speed;
-        return(retval);
+        if (locobuffer[i].address == addr)
+          {
+            // replace it
+
+            locobuffer[i].address = addr;
+            locobuffer[i].refresh = 0;
+            
+            if ((speed ^ locobuffer[i].speed) & 0x80) retval = (1 << ORGZ_SLOW_DOWN);  // dir changed
+            if ((speed & 0x7F) < (locobuffer[i].speed & 0x7F))  retval = (1 << ORGZ_SLOW_DOWN);   // brake
+            
+            locobuffer[i].speed = speed;
+            lb_index = i;
+            return(retval);
+         }
       }
-    // same entry
-    locobuffer[lb_index].refresh = 0;
-    if ((speed ^ locobuffer[lb_index].speed) & 0x80) retval |= (1 << ORGZ_SLOW_DOWN);      // dir changed
-    if ((speed & 0x7F) < (locobuffer[lb_index].speed & 0x7F)) retval |= (1 << ORGZ_SLOW_DOWN);   // brake
-    
-    locobuffer[lb_index].speed = speed;
+    // does not yet exist -> find either empty entry or replace oldest one
+    // we noramlly use DCC_DEFAULT_FORMAT (see get_loco_format())
+    // find an empty entry
+    for (i=0; i<SIZE_LOCOBUFFER; i++)
+      {
+        if (locobuffer[i].address == 0)
+          {
+            // fill it
+            locobuffer[i].address = addr;
+            locobuffer[i].refresh = 0;
+            locobuffer[i].format = get_loco_format(addr);
+            locobuffer[i].speed = speed;
+            lb_index = i;
+            return(0);
+          }
+      }
+    // find oldest entry
+    found_i = 0; found_r = 0;
+    for (i=0; i<SIZE_LOCOBUFFER; i++)
+      {
+        if (locobuffer[i].refresh > found_r)
+          {
+            found_i = i; found_r = locobuffer[i].refresh;
+          }
+      }
+    locobuffer[found_i].address = addr;
+    locobuffer[found_i].refresh = 0;
+    locobuffer[found_i].format = get_loco_format(addr);
+    locobuffer[found_i].speed = speed;
+    lb_index = found_i;
+    retval = (1 << ORGZ_STOLEN);
     return(retval);
- }
+  }
 
 
 //-----------------------------------------------------------------------------------
@@ -1049,40 +985,99 @@ unsigned char enter_speed_to_locobuffer(unsigned char slot, unsigned int addr,
 //        3 = f9 - f12
 // return:  byte:  Errorcode - (stolen...)
 
-unsigned char enter_func_to_locobuffer(unsigned char slot, unsigned int addr, unsigned char funct, unsigned char grp)
+unsigned char enter_func_to_locobuffer(unsigned int addr, unsigned char funct, unsigned char grp)
   {
-    unsigned char retval = 0;
-
-    retval = get_entry(slot, addr);     // set also lb_index
+    unsigned char i, found_i, found_r;
+    // find same entry
+    for (i=0; i<SIZE_LOCOBUFFER; i++)
+      {
+        if (locobuffer[i].address == addr)
+          {
+            // replace it
+            locobuffer[i].address = addr;
+            if (grp == 0)
+              {
+                locobuffer[i].fl = funct & 0x01 ;
+              }
+            if (grp == 1)
+              {
+                locobuffer[i].f4_f1 = funct & 0x0F;           
+              }
+            if (grp == 2)
+              {
+                locobuffer[i].f8_f5 = funct & 0x0F;
+              }
+            if (grp == 3)
+              {
+                locobuffer[i].f12_f9 = funct & 0x0F;
+              }
+            lb_index = i;
+            return(0);
+         }
+      }
+    // find an empty entry
+    for (i=0; i<SIZE_LOCOBUFFER; i++)
+      {
+        if (locobuffer[i].address == 0)
+          {
+            // fill it
+            locobuffer[i].address = addr;
+            locobuffer[i].refresh = 0;
+            locobuffer[i].speed = 0;
+            locobuffer[i].format = get_loco_format(addr);
+            if (grp == 0)
+              {
+                locobuffer[i].fl = funct & 0x01;
+              }
+            if (grp == 1)
+              {
+                locobuffer[i].f4_f1 = funct & 0x0F;
+              }
+            if (grp == 2)
+              {
+                locobuffer[i].f8_f5 = funct & 0x0F;
+              }
+            if (grp == 3)
+              {
+                locobuffer[i].f12_f9 = funct & 0x0F;
+              }
+            lb_index = i;
+            return(0);
+          }
+      }
+    // find oldest entry
+    found_i = 0; found_r = 0;
+    for (i=0; i<SIZE_LOCOBUFFER; i++)
+      {
+        if (locobuffer[i].refresh > found_r)
+          {
+            found_i = i; found_r = locobuffer[i].refresh;
+          }
+      }
+    locobuffer[found_i].address = addr;
+    locobuffer[found_i].refresh = 0;
+    locobuffer[found_i].speed = 0;
+    locobuffer[found_i].format = get_loco_format(addr);
+    
     if (grp == 0)
       {
-        locobuffer[lb_index].fl = funct & 0x01;
+        locobuffer[found_i].fl = funct & 0x01;
       }
     if (grp == 1)
       {
-        locobuffer[lb_index].f4_f1 = funct & 0x0F;
+        locobuffer[found_i].f4_f1 = funct & 0x0F;
       }
     if (grp == 2)
       {
-        locobuffer[lb_index].f8_f5 = funct & 0x0F;
+        locobuffer[found_i].f8_f5 = funct & 0x0F;
       }
     if (grp == 3)
       {
-        locobuffer[lb_index].f12_f9 = funct & 0x0F;
+        locobuffer[found_i].f12_f9 = funct & 0x0F;
       }
-    #if (DCC_F13_F28 == 1)
-    if (grp == 4)
-      {
-        locobuffer[lb_index].f20_f13 = funct;
-      }
-    if (grp == 5)
-      {
-        locobuffer[lb_index].f28_f21 = funct;
-      }
-    #endif
-    return(retval);
+    lb_index = found_i;
+    return(1 << ORGZ_STOLEN);
   }
-
 
 
 // scan locobuffer and return the next address; 0 if not found
@@ -1150,6 +1145,7 @@ void delete_from_locobuffer(unsigned int addr)
 //
 // Notes: Address handling: 1...DCC_SHORT_ADDR_LIMIT:          DCC short address
 //                          DCC_SHORT_ADDR_LIMIT+1 ... 10239: long address
+
 
 // Note on speed handling:
 
@@ -1228,6 +1224,7 @@ t_message * build_f1_message_from_locobuffer(unsigned char i)
 t_message * build_f2_message_from_locobuffer(unsigned char i)
   {
     if (locobuffer[i].address > DCC_SHORT_ADDR_LIMIT)
+
       {
         build_function_14a_grp2(locobuffer[i].address, locobuffer[i].f8_f5, locobuff_mes_ptr);
       }
@@ -1251,47 +1248,37 @@ t_message * build_f3_message_from_locobuffer(unsigned char i)
     return (locobuff_mes_ptr);
   }
 
-#if (DCC_F13_F28 == 1)
-t_message * build_f4_message_from_locobuffer(unsigned char i)
+
+
+void incr_cur_i (void)    // hilfsroutine
   {
-    if (locobuffer[i].address > DCC_SHORT_ADDR_LIMIT)
+    unsigned char j; unsigned char temp;
+    cur_i += 1;
+    if (cur_i == SIZE_LOCOBUFFER)
       {
-        build_function_14a_grp4(locobuffer[i].address, locobuffer[i].f20_f13, locobuff_mes_ptr);
+        cur_i = 0;         // next run
+        cur_ref_level++;   // with higher level
+        if (cur_ref_level == 10)
+          {
+            // level has reached top: now fade out all refresh levels.
+            cur_ref_level = 0;
+            for (j=0; j<SIZE_LOCOBUFFER; j++)
+              {
+                temp = locobuffer[j].refresh + 1;         // nicht elegant, aber schnell
+                if (temp > 100) temp = 100;
+                locobuffer[j].refresh = temp;
+              }
+          }
       }
-    else
-      {
-        build_function_7a_grp4(locobuffer[i].address, locobuffer[i].f20_f13, locobuff_mes_ptr);
-      }
-    return (locobuff_mes_ptr);
+
   }
-
-t_message * build_f5_message_from_locobuffer(unsigned char i)
-  {
-    if (locobuffer[i].address > DCC_SHORT_ADDR_LIMIT)
-      {
-        build_function_14a_grp5(locobuffer[i].address, locobuffer[i].f28_f21, locobuff_mes_ptr);
-      }
-    else
-      {
-        build_function_7a_grp5(locobuffer[i].address, locobuffer[i].f28_f21, locobuff_mes_ptr);
-      }
-    return (locobuff_mes_ptr);
-  }
-#endif
-
-
-
-#if (DCC_F13_F28 == 1)
-  #define CUR_REF_LEVEL_MAX  10
-#else
-  #define CUR_REF_LEVEL_MAX  6
-#endif
-
 
 ///-----------------------------------------------------------------------------------
 // search_locobuffer returns pointer to dcc message
 // The search result depends on the current searchlevel:
-// level 0..3: refresh only new locos -> speed
+// level 0: refresh only new locos -> speed
+// level 1: refresh only new and fresh messages
+// level 2..3: refresh new, fresh and older
 // level 4: refresh all locos -> speed
 // level 5: refresh all locos -> func grp 1
 // level 6: refresh all locos -> speed
@@ -1300,98 +1287,72 @@ t_message * build_f5_message_from_locobuffer(unsigned char i)
 // level 9: refresh all locos -> func grp 3
 //
 //
-t_message * get_next_item_from_locobuffer(void)    
+t_message * search_locobuffer(void)    
   {
-    unsigned char wrap = 0;
-
     loco_search_ptr = &loco_search;
     while(1)
       {
-        cur_i += 1;
-        if (cur_i >= SIZE_LOCOBUFFER)
-          {
-            if (wrap > 1) { cur_i = SIZE_LOCOBUFFER; return(&DCC_Idle); }  // empty line
-            cur_i = 0;
-            wrap++;
-            cur_ref_level++;   // with higher level
-            if (cur_ref_level == CUR_REF_LEVEL_MAX)
-              {
-                // level has reached top: now fade out all refresh levels.
-                cur_ref_level = 0;
-                unsigned char j; 
-                for (j=0; j<SIZE_LOCOBUFFER; j++)
-                  {
-                    unsigned char temp;
-                    temp = locobuffer[j].refresh + 1;         // nicht elegant, aber schnell
-                    if (temp > 200) temp = 200;
-                    locobuffer[j].refresh = temp;
-                  }
-              }
-          }
+        incr_cur_i();                          // current index ++
+
         if (locobuffer[cur_i].address != 0)
 		  {
-            if (cur_ref_level & 0x01)
-              {
-                switch (cur_ref_level >> 1)
-                  {
-    		        default:
-                    case 0:
-    				    if ((locobuffer[cur_i].fl != 0) || (locobuffer[cur_i].f4_f1 != 0))
-    					  {
-                            return(build_f1_message_from_locobuffer(cur_i));
-                          }
-                        break;
-    				case 1:
-    				    if (locobuffer[cur_i].f8_f5 != 0)
-    					  {
-                            return(build_f2_message_from_locobuffer(cur_i));
-                          }
-                        break;
-    				case 2:
-    				    if (locobuffer[cur_i].f12_f9 != 0)
-    					  {
-                            return(build_f3_message_from_locobuffer(cur_i));
-                          }
-                        break;
-    #if (DCC_F13_F28 == 1)
-    				case 3:
-    				    if (locobuffer[cur_i].f20_f13 != 0)
-    					  {
-                            return(build_f4_message_from_locobuffer(cur_i));
-                          }
-                        break;
-    				case 4:
-    				    if (locobuffer[cur_i].f28_f21 != 0)
-    					  {
-                            return(build_f5_message_from_locobuffer(cur_i));
-                          }
-                        break;
-    #endif
-                  }
-              }
-            else
-                return(build_speed_message_from_locobuffer(cur_i));
+     		switch (cur_ref_level)
+	    	  {
+		        case 0:
+				case 1:
+				case 2:
+				case 3:
+				    if (locobuffer[cur_i].refresh <= cur_ref_level)
+	                  {
+                        // target found
+                        return(build_speed_message_from_locobuffer(cur_i));
+                      }
+                    break;
+				case 4:
+				    return(build_speed_message_from_locobuffer(cur_i));
+                    break;
+				case 5:
+				    if ((locobuffer[cur_i].fl != 0) || (locobuffer[cur_i].f4_f1 != 0))
+					  {
+                        // target found
+                        return(build_f1_message_from_locobuffer(cur_i));
+                      }
+                    break;
+				case 6:
+				    return(build_speed_message_from_locobuffer(cur_i));
+                    break;
+				case 7:
+				    if (locobuffer[cur_i].f8_f5 != 0)
+					  {
+                        // target found
+                        return(build_f2_message_from_locobuffer(cur_i));
+                      }
+                    break;
+				case 8:
+				    return(build_speed_message_from_locobuffer(cur_i));
+                    break;
+				case 9:
+				    if (locobuffer[cur_i].f12_f9 != 0)
+					  {
+                        // target found
+                        return(build_f3_message_from_locobuffer(cur_i));
+                      }
+                    break;
+		      }
           }
+        if (cur_i == 0)
+          {
+            loco_search_ptr = &DCC_Idle;
+            return (loco_search_ptr);           // completed whole level in locobuffer, nothing found
+          }                                     // emergency return;
       }
-//     return (&DCC_Idle);                   // void
+    loco_search_ptr = &DCC_Idle;
+    return (loco_search_ptr);                   // void
   }
 
 
-t_message * search_locobuffer(void)
-  {
-    t_message *my_search_ptr;
-    unsigned char old_i;
 
-    old_i = cur_i;
-    my_search_ptr = get_next_item_from_locobuffer();
-    if (old_i == cur_i)
-      {
-        if (cur_ref_level > 0) cur_ref_level--; // back one level
-        cur_i = SIZE_LOCOBUFFER+1;                // set to max -> void
-        return(&DCC_Idle);
-      }
-    return(my_search_ptr);
-  }
+
 
 
 //==========================================================================================
@@ -1462,9 +1423,7 @@ void init_organizer(void)
     hp_write = 0;
     lp_read = 0;
     lp_write = 0;
-    organizer_state.halted = 0;
-    organizer_state.lok_stolen_by_pc = 0;
-    organizer_state.lok_stolen_by_handheld = 0;
+    organizer_halt_state = 0;
 
     for (i=0; i<SIZE_REPEATBUFFER; i++)
       {
@@ -1474,12 +1433,12 @@ void init_organizer(void)
 
     init_locobuffer();
 
-    virtual_decoder_offset = eeprom_read_word((void *)eadr_virtual_decoder_l); 
+    dcc_default_format = DCC_DEFAULT_FORMAT;
 
-    dcc_acc_repeat = eeprom_read_byte((void *)eadr_dcc_acc_repeat); 
-    dcc_pom_repeat = eeprom_read_byte((void *)eadr_dcc_pom_repeat); 
-    dcc_func_repeat = eeprom_read_byte((void *)eadr_dcc_func_repeat); 
-    dcc_speed_repeat = eeprom_read_byte((void *)eadr_dcc_speed_repeat); 
+    dcc_acc_repeat = NUM_DCC_ACC_REPEAT;
+    dcc_pom_repeat = NUM_DCC_POM_REPEAT;
+    dcc_func_repeat = NUM_DCC_FUNC_REPEAT;
+    dcc_speed_repeat = NUM_DCC_SPEED_REPEAT;
 
   }
 
@@ -1759,7 +1718,7 @@ unsigned char put_in_queue_low(t_message *new_message)
         case PROG_SHORT:           //
         case PROG_OFF:
         case PROG_ERROR:
-            //if (!prog_event.busy)   // wenn da gerade nichts läuft, dann können wir.
+            // FIXME if (!programmer_busy())
               {
                 retval = put_in_queue_prog(new_message);
               }
@@ -1801,9 +1760,8 @@ void update_repeatbuffer(t_message *new_message)
   unsigned char run_repeat = 255;
   unsigned char i; unsigned char found_i=0;
 
-    if (new_message->repeat == 0) return;    // der will gar keinen repeat haben
+    if (new_message->repeat == 0) return;      // der will gar keinen repeat haben
     if (new_message->type == is_prog) return;  // der soll keinen repeat haben (nur immediate)
- 
     for (i=0; i<SIZE_REPEATBUFFER; i++)
       {
         if (repeatbuffer[i].dcc[0] == new_message->dcc[0])
@@ -1903,6 +1861,7 @@ void clear_from_repeatbuffer(t_message *new_message)
       }
   } */
 
+// only loco commands
 void clear_from_repeatbuffer(t_message *new_message)
   {
     unsigned char i;
@@ -1955,16 +1914,16 @@ void clear_from_repeatbuffer(t_message *new_message)
 // set_next_message: forward the current message to dccout.c
 // next_message_count is the flag of DCCOUT - a new message has arrived
 
-void set_next_message (t_message *msg)
+void set_next_message (t_message *new)
   {
     unsigned char my_repeat;
 
-    memcpy(next_message.dcc, msg->dcc, msg->size);
+    memcpy(next_message.dcc, new->dcc, new->size);
 
     // now scan this message for speed command and replaces the speed value depending
     // on organizer_halt_state
 
-    if (organizer_state.halted)
+    if (organizer_halt_state > 0)
       {
         if ( (next_message.dcc[0] > 0) &&
              (next_message.dcc[0] < 112) ) // short adr.
@@ -1994,12 +1953,12 @@ void set_next_message (t_message *msg)
           }
       }
 
-    next_message.size = msg->size;
-    next_message.type = msg->type;
+    next_message.size = new->size;
+    next_message.type = new->type;
 
-    if (msg->type == is_prog)
-      {                                      // prog commands keep their repeat
-        my_repeat = msg->repeat;             // immediate repeat
+    if (new->type == is_prog)
+      {                                      // prog commands keep their repeat (like PoM)
+        my_repeat = new->repeat;             // immediate repeat
         if (my_repeat == 0) my_repeat = 1;   // at least once
         next_message_count = my_repeat;
       }
@@ -2071,6 +2030,8 @@ void run_organizer(void)
 	    case RUN_OKAY:      // all runnung
         case RUN_PAUSE:     // slow down
         case RUN_STOP:      // speed 0		
+
+        	//Serial_println( "run_okay " );
             // check queue_hp
             if ((hp_write != hp_read) &&
                 (queue_hp[hp_read].dcc[0] != next_message.dcc[0]))
@@ -2109,15 +2070,16 @@ void run_organizer(void)
                     else
                       {
                         my_search_ptr = search_locobuffer();
-                        set_next_message(my_search_ptr);
-                        // if (my_search_ptr->dcc[0] != next_message.dcc[0] )
-                        //  {
-                        //    set_next_message(my_search_ptr);
-                        //  }
-                        // else
-                        //  { // nichts gefunden, dann halt idle
-                        //    set_next_message(&DCC_Idle);
-                        //  }
+                        if (my_search_ptr->dcc[0] != next_message.dcc[0] )
+                          {
+                            // read this message from locobuffer
+                            set_next_message(my_search_ptr);
+                          }
+                        else
+                          { // nichts gefunden, dann halt idle
+                            my_search_ptr = &DCC_Idle;
+                            set_next_message(my_search_ptr);
+                          }
                       }
                   }
               }
@@ -2173,15 +2135,13 @@ void run_organizer(void)
 //  Summary of commands to organizer:
 //      init_organizer(void)
 //      organizer_ready(void)
-//      do_loco_speed_f(slot, addr, speed, format)   set speed and format for a loco
-//      do_loco_speed(slot, addr, speed)             set speed for a loco
-//      do_loco_func_grp0(slot, addr, funct)         light
-//      do_loco_func_grp1(slot, addr, funct)         f1-f4
-//      do_loco_func_grp2(slot, addr, funct)         f5-f8
-//      do_loco_func_grp3(slot, addr, funct)         f9-f12
-//      do_loco_func_grp4(slot, addr, funct)         f13-f20
-//      do_loco_func_grp5(slot, addr, funct)         f21-f28
-//      do_accessory(slot, addr, output, activate)   turnout
+//      do_loco_speed_f(addr, speed, format)   set speed and format for a loco
+//      do_loco_speed(addr, speed)             set speed for a loco
+//      do_loco_func_grp0(addr, funct)         light
+//      do_loco_func_grp1(addr, funct)         f1-f4
+//      do_loco_func_grp2(addr, funct)         f5-f8
+//      do_loco_func_grp3(addr, funct)         f9-f12
+//      do_accessory(addr, output, activate)   turnout
 //      do_pom_loco(addr, cv, data)            program on the main
 //      do_pom_accessory(addr, cv, data)       program on the main
 //      do_all_stop(void)                      Halt all locos
@@ -2224,12 +2184,12 @@ bool organizer_ready(void)
 //
 // return:    false, if full; return 1 if there is still space
 // 
-unsigned char do_loco_speed_f(unsigned char slot, unsigned int addr, unsigned char speed, t_format format)
+unsigned char do_loco_speed_f(unsigned int addr, unsigned char speed, t_format format)
   {
     unsigned char index, retval;
     t_message *my_message;
 
-    retval = enter_speed_f_to_locobuffer(slot, addr, speed, format);
+    retval = enter_speed_f_to_locobuffer(addr, speed, format);
     index = last_locobuffer_index();
     if (retval & (1 << ORGZ_SLOW_DOWN) )
       {  // slow down or direction change
@@ -2254,12 +2214,13 @@ unsigned char do_loco_speed_f(unsigned char slot, unsigned int addr, unsigned ch
 // return false, if full; return 1 if there is still space
 
 
-unsigned char do_loco_speed(unsigned char slot, unsigned int addr, unsigned char speed)
+unsigned char do_loco_speed(unsigned int addr, unsigned char speed)
   {
     unsigned char index, retval;
     t_message *my_message;
 
-    retval = enter_speed_to_locobuffer(slot, addr, speed);
+    // does this loco exist?
+    retval = enter_speed_to_locobuffer(addr, speed);
     index = last_locobuffer_index();
     if (retval & (1 << ORGZ_SLOW_DOWN) )
       {  // slow down or direction change
@@ -2281,64 +2242,46 @@ unsigned char do_loco_speed(unsigned char slot, unsigned int addr, unsigned char
 
 // Loco function einstellen
 
-unsigned char do_loco_func_grp0(unsigned char slot, unsigned int addr, unsigned char funct)
+unsigned char do_loco_func_grp0(unsigned int addr, unsigned char funct)
   {
     unsigned char index, retval;
 
-    retval = enter_func_to_locobuffer(slot, addr, funct, 0);
+    retval = enter_func_to_locobuffer(addr, funct, 0);
     index = last_locobuffer_index();
     retval |= put_in_queue_low(build_f1_message_from_locobuffer(index));   // grp 0 = light
     return(retval);
   }
 
 
-unsigned char do_loco_func_grp1(unsigned char slot, unsigned int addr, unsigned char funct)
+unsigned char do_loco_func_grp1(unsigned int addr, unsigned char funct)
   {
     unsigned char index, retval;
 
-    retval = enter_func_to_locobuffer(slot, addr, funct, 1);
+    retval = enter_func_to_locobuffer(addr, funct, 1);
     index = last_locobuffer_index();
     retval |= put_in_queue_low(build_f1_message_from_locobuffer(index));   // grp 1
     return(retval);
   }
-unsigned char do_loco_func_grp2(unsigned char slot, unsigned int addr, unsigned char funct)
+
+unsigned char do_loco_func_grp2(unsigned int addr, unsigned char funct)
   {
     unsigned char index, retval;
 
-    retval = enter_func_to_locobuffer(slot, addr, funct, 2);
+    retval = enter_func_to_locobuffer(addr, funct, 2);
     index = last_locobuffer_index();
     retval |= put_in_queue_low(build_f2_message_from_locobuffer(index));   // grp 2
     return(retval);
+
   }
-unsigned char do_loco_func_grp3(unsigned char slot, unsigned int addr, unsigned char funct)
+unsigned char do_loco_func_grp3(unsigned int addr, unsigned char funct)
   {
     unsigned char index, retval;
 
-    retval = enter_func_to_locobuffer(slot, addr, funct, 3);
+    retval = enter_func_to_locobuffer(addr, funct, 3);
     index = last_locobuffer_index();
     retval |= put_in_queue_low(build_f3_message_from_locobuffer(index));   // grp 3
     return(retval);
   }
-#if (DCC_F13_F28 == 1)
-unsigned char do_loco_func_grp4(unsigned char slot, unsigned int addr, unsigned char funct)
-  {
-    unsigned char index, retval;
-
-    retval = enter_func_to_locobuffer(slot, addr, funct, 4);
-    index = last_locobuffer_index();
-    retval |= put_in_queue_low(build_f4_message_from_locobuffer(index));   // grp 4
-    return(retval);
-  }
-unsigned char do_loco_func_grp5(unsigned char slot, unsigned int addr, unsigned char funct)
-  {
-    unsigned char index, retval;
-
-    retval = enter_func_to_locobuffer(slot, addr, funct, 5);
-    index = last_locobuffer_index();
-    retval |= put_in_queue_low(build_f5_message_from_locobuffer(index));   // grp 5
-    return(retval);
-  }
-#endif
 
 
 // 
@@ -2347,7 +2290,7 @@ unsigned char do_loco_func_grp5(unsigned char slot, unsigned int addr, unsigned 
 //             activate: off, on = [0,1]; 
 // special:    if addr >= virtual_decoder_offset, then remap the call to dmx
 
-bool do_accessory(unsigned char slot, unsigned int addr, unsigned char output, unsigned char activate)      // turnout
+bool do_accessory(unsigned int addr, unsigned char output, unsigned char activate)      // turnout
   {
     unsigned char retval;
 
@@ -2355,10 +2298,10 @@ bool do_accessory(unsigned char slot, unsigned int addr, unsigned char output, u
         if (addr >= virtual_decoder_offset)
           {
             do_dmx((addr - virtual_decoder_offset)*2 + output);
-            return(0);   // queues not affected, therefore always without errors
+            return(0);   // queues not affected, therefore always return without error code
           }
     #endif
-    if (activate) save_turnout(slot, addr, output);
+    if (activate) save_turnout(addr, output);
     build_nmra_basic_accessory(addr, output, activate, locobuff_mes_ptr);
     retval = put_in_queue_low(locobuff_mes_ptr);
     return(retval);
@@ -2424,7 +2367,7 @@ void do_all_stop(void)
 
     put_in_queue_hp(&DCC_BC_Brake);
 
-    organizer_state.halted = 1;
+    organizer_halt_state = 2;
   }
 
 

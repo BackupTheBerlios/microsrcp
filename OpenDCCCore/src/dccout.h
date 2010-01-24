@@ -69,4 +69,3 @@ void dccout_disable_cutout(void);
 
 unsigned char dccout_query_cutout(void);
 
-

@@ -66,8 +66,6 @@
 //#define SHORT_MAIN 0     // in
 //#define SHORT_PROG 1     // in
 
-
-
 #if (__AVR_ATmega328P__)
 	// Port B
 	#define NDCC       2     // out
@@ -82,12 +80,12 @@
 	#define ENA_MAIN   7     // out  high = enable main
 #endif
 
-
 //------------------------------------------------------------------------
 // LED-Control and IO-Macros
 
 
 // this results after compile: sbi(PORTB,MY_CTS)
+
 #if (__AVR_ATmega328P__)
 	#define MAIN_TRACK_ON    PORTB |= (1<<ENA_MAIN)
 	#define MAIN_TRACK_OFF   PORTB &= ~(1<<ENA_MAIN)
@@ -95,7 +93,7 @@
 	#define PROG_TRACK_ON    PORTB |= (1<<ENA_PROG)
 	#define PROG_TRACK_OFF   PORTB &= ~(1<<ENA_PROG)
 	#define PROG_TRACK_STATE (PINB & (1<<ENA_PROG))
-#else // ATmega32, 644, 644P etc.
+#else
 	#define MAIN_TRACK_ON    PORTD |= (1<<ENA_MAIN)
 	#define MAIN_TRACK_OFF   PORTD &= ~(1<<ENA_MAIN)
 	#define MAIN_TRACK_STATE (PIND & (1<<ENA_MAIN)))

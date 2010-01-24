@@ -25,7 +25,6 @@
 //            2008-08-18 V0.8 railcom cutout added - see CUTOUT_GAP
 //            2008-09-11      railcom cutout shifted by one bit (bugfix)
 //            2009-06-23 V0.9 DCC message size imported from config.h (MAX_DCC_SIZE)
-//            2009-07-21 V0.10 mm bug fix speed 11
 //			  2010-01-24 Angepasst an Arduinoboard mit ATmega328P, Marcel Bernet
 //
 //-----------------------------------------------------------------
@@ -284,7 +283,6 @@ void do_send(bool myout)
       {                                     // 0 - make a long pwm pulse
         TCCR1A = (1<<COM1A1) | (0<<COM1A0)  //  clear OC1A (=DCC) on compare match
                | (1<<COM1B1) | (1<<COM1B0)  //  set   OC1B (=NDCC) on compare match
-               | (0<<FOC1A)  | (0<<FOC1B)   //  reserved in PWM, set to zero
                | (0<<WGM11)  | (0<<WGM10);  //  CTC (together with WGM12 and WGM13)
         OCR1A = F_CPU * PERIOD_0 / 2 / 1000000L;               //1856
         OCR1B = F_CPU * PERIOD_0 / 2 / 1000000L;               //1856
@@ -293,7 +291,6 @@ void do_send(bool myout)
       {                                     // 1 - make a short pwm puls
         TCCR1A = (1<<COM1A1) | (0<<COM1A0)  //  clear OC1A (=DCC) on compare match
                | (1<<COM1B1) | (1<<COM1B0)  //  set   OC1B (=NDCC) on compare match
-               | (0<<FOC1A)  | (0<<FOC1B)   //  reserved in PWM, set to zero
                | (0<<WGM11)  | (0<<WGM10);  //  CTC (together with WGM12 and WGM13)
         OCR1A = F_CPU * PERIOD_1 / 1000000L / 2;               //928
         OCR1B = F_CPU * PERIOD_1 / 1000000L / 2;               //928
@@ -308,7 +305,6 @@ void do_send_no_B(bool myout)
       {                                     // 0 - make a long pwm pulse
         TCCR1A = (1<<COM1A1) | (0<<COM1A0)  //  clear OC1A (=DCC) on compare match
                | (1<<COM1B1) | (1<<COM1B0)  //  set   OC1B (=NDCC) on compare match
-               | (0<<FOC1A)  | (0<<FOC1B)   //  reserved in PWM, set to zero
                | (0<<WGM11)  | (0<<WGM10);  //  CTC (together with WGM12 and WGM13)
         OCR1A = F_CPU * PERIOD_0 / 2 / 1000000L;               //1856 (for 16MHz)
         OCR1B = F_CPU / 1000000L * 4 * PERIOD_0 / 2 ;          // extended (cutout starts after OCR1A)
@@ -317,7 +313,6 @@ void do_send_no_B(bool myout)
       {                                     // 1 - make a short pwm puls
         TCCR1A = (1<<COM1A1) | (0<<COM1A0)  //  clear OC1A (=DCC) on compare match
                | (1<<COM1B1) | (1<<COM1B0)  //  set   OC1B (=NDCC) on compare match
-               | (0<<FOC1A)  | (0<<FOC1B)   //  reserved in PWM, set to zero
                | (0<<WGM11)  | (0<<WGM10);  //  CTC (together with WGM12 and WGM13)
         // OCR1A = F_CPU * PERIOD_1  / 2 / 1000000L ;            //928
         OCR1A = F_CPU * CUTOUT_GAP / 1000000L ;            //928
@@ -387,7 +382,6 @@ ISR(TIMER1_COMPA_vect)
           {
             TCCR1A = (1<<COM1A1) | (1<<COM1A0)  //  set   OC1A (=DCC) on compare match
                    | (1<<COM1B1) | (1<<COM1B0)  //  set   OC1B (=NDCC) on compare match
-                   | (0<<FOC1A)  | (0<<FOC1B)   //  reserved in PWM, set to zero
                    | (0<<WGM11)  | (0<<WGM10);  //  CTC (together with WGM12 and WGM13)
             #if (DEBUG_SCOPE == 2)
     	       DMX_OUT_HIGH;
@@ -402,7 +396,6 @@ ISR(TIMER1_COMPA_vect)
           {
             TCCR1A = (1<<COM1A1) | (1<<COM1A0)  //  set   OC1A (=DCC) on compare match
                    | (1<<COM1B1) | (0<<COM1B0)  //  clear OC1B (=NDCC) on compare match
-                   | (0<<FOC1A)  | (0<<FOC1B)   //  reserved in PWM, set to zero
                    | (0<<WGM11)  | (0<<WGM10);  //  CTC (together with WGM12 and WGM13)
             //was: doi.phase = 1;
             #if (DEBUG_SCOPE == 2)
@@ -564,7 +557,7 @@ void init_dccout(void)
     next_message.dcc[0] = 0;
     next_message.dcc[1] = 0;
 
-    doi.railcom_enabled = eeprom_read_byte((void *)eadr_railcom_enabled);
+    doi.railcom_enabled = 0;
 
     #if (TURNOUT_FEEDBACK_ENABLED == 1)
       feedback_ready = 0;
@@ -580,7 +573,6 @@ void init_dccout(void)
      // note: DDR for Port D4 and D5 must be enabled
     TCCR1A = (1<<COM1A1) | (0<<COM1A0)  //  clear OC1A (=DCC) on compare match
            | (1<<COM1B1) | (1<<COM1B0)  //  set   OC1B (=NDCC) on compare match
-           | (0<<FOC1A)  | (0<<FOC1B)   //  reserved in PWM, set to zero
            | (0<<WGM11)  | (0<<WGM10);  //  CTC (together with WGM12 and WGM13)
                                           //  TOP is OCR1A
 
@@ -688,7 +680,7 @@ ISR(TIMER1_COMPA_vect)
     // two phases: phase 0: just repeat same duration, but invert output.
     //             phase 1: create new bit.
 	// we use back read of PIND instead of phase
-    if (!(PINB & (1<<DCC)))  //was: (doi.phase == 0)
+    if (!(PIND & (1<<DCC)))  //was: (doi.phase == 0)
 	  {
 	    if ((doi.state == dos_cutout_2) && doi.railcom_enabled)
           {
@@ -1425,7 +1417,7 @@ unsigned char mm2_speed_funct_2_trit[16][4][2]  PROGMEM =
    {{0x5a, 0x5b}, // speed 11 f1  01011010 = s s o o   01011011 = s s o 1
     {0x0e, 0x1b}, // speed 11 f2  00001110 = 0 0 1 o   00011011 = 0 s o 1 // f2=on jetzt 0101
     {0x1e, 0x1f}, // speed 11 f3  00011110 = 0 s 1 o   00011111 = 0 s 1 1
-    {0x5e, 0x5f}, // speed 11 f4  01011110 = s s 1 o   01011111 = s s 1 1
+    {0x4e, 0x4f}, // speed 11 f4  01011110 = s s 1 o   01011111 = s s 1 1
    },
    {{0xda, 0xdb}, // speed 12 f1  11011010 = 1 s o o   11011011 = 1 s o 1
     {0x8e, 0x8f}, // speed 12 f2  10001110 = o 0 1 o   10001111 = o 0 1 1
