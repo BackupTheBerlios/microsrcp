@@ -39,17 +39,22 @@ byte ip[] = { 192, 168, 1, 241 };
 // Definition der I2C Boards - muss fuer weitere Boards erweitert werden.
 srcp::device_config_t deviceConfig[] =
 	{
-		////////////////////// Board 1 //////////////////////////////////////////
+		////////////////////// Board 1 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
 		// Die SRCP Adressen 32 - 63 werden an I2C Board 1 weitergeleitet
 		{ 32, 63, srcp::GA, srcp::I2CGAMaster, { 1 } },
 		// Die SRCP Adressen 64 - 96 werden an I2C Board 1 weitergeleitet
 		{ 64, 96, srcp::GA, srcp::I2CGAMaster, { 1 } },
 		// Die SRCP Rueckmelder 1 - 8 befinden sich auf I2C Board 1
 		{ 1, 8, srcp::FB, srcp::I2CFBMaster, { 1 } },
-		// Loks mit der SRCP Adresse 3 und 4 werden an I2C Board 100 weitergeleitet
 
-		////////////////////// Board 100 //////////////////////////////////////////
+		////////////////////// Board 99 - OpenDCC //////////////////////////////////////////////////
+		// Loks mit der SRCP Adresse 10 und 254 werden an I2C Board 99 weitergeleitet
+		{ 10, 254, srcp::GL, srcp::I2CGLMaster, { 99 } },
+
+		////////////////////// Board 100 - Motorentreiber //////////////////////////////////////////
+		// Loks mit der SRCP Adresse 3 und 4 werden an I2C Board 100 weitergeleitet
 		{ 3, 4, srcp::GL, srcp::I2CGLMaster, { 100 } },
+
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
 	};
