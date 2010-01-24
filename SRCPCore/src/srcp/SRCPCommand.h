@@ -57,9 +57,9 @@ namespace srcp
 		};
 	};
 
-	enum GADevices { I2CGAMaster, GASignal, GAServo };
-	enum GLDevices { I2CGLMaster, GLAnalog293, GLAFMotor, GLArduinoMotor };
-	enum FBDevices { I2CFBMaster, FBSwitchSensor };
+	enum GADevices { I2CGAMaster, GADCC, GASignal, GAServo, GA_EOF };
+	enum GLDevices { I2CGLMaster, GLDCC, GLAnalog293, GLAFMotor, GLArduinoMotor, GL_EOF };
+	enum FBDevices { I2CFBMaster, FBS88 /* reserviert */, FBSwitchSensor, FB_EOF  };
 
 	struct	device_config_t
 	{

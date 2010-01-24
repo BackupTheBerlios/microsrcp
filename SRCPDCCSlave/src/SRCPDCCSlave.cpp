@@ -54,8 +54,13 @@ extern "C"
 // Definition der lokalen Geraete
 srcp::device_config_t deviceConfig[] =
 	{
-		// SRCP Adressen 10 - 254 via DCC Protokoll haendeln
-		{ 10, 254, srcp::GL, srcp::GLArduinoMotor , { 0, 0 } },
+		// SRCP Lokomotiven 10 - 254 via DCC Protokoll haendeln
+		{ 10, 254, srcp::GL, srcp::GLDCC },
+
+		// SRCP Zubehoer 80 - 254 via DCC Protokoll haendeln,
+		// ACHTUNG: Versatzadresse vom Server beruecksichtigen!
+		{ 1, 254, srcp::GA, srcp::GADCC },
+
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
 	};

@@ -8,6 +8,7 @@
 #ifndef GLOPENDCC_H_
 #define GLOPENDCC_H_
 
+#include <WProgram.h>
 #include <srcp/SRCPGenericLoco.h>
 
 namespace dcc

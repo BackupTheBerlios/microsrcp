@@ -48,8 +48,9 @@ srcp::device_config_t deviceConfig[] =
 		{ 1, 8, srcp::FB, srcp::I2CFBMaster, { 1 } },
 
 		////////////////////// Board 99 - OpenDCC //////////////////////////////////////////////////
-		// Loks mit der SRCP Adresse 10 und 254 werden an I2C Board 99 weitergeleitet
+		// Loks und Zubehoer mit der SRCP Adresse 10 und 254 werden an I2C Board 99 weitergeleitet
 		{ 10, 254, srcp::GL, srcp::I2CGLMaster, { 99 } },
+		{ 80, 254, srcp::GA, srcp::I2CGAMaster, { 99 } },
 
 		////////////////////// Board 100 - Motorentreiber //////////////////////////////////////////
 		// Loks mit der SRCP Adresse 3 und 4 werden an I2C Board 100 weitergeleitet
