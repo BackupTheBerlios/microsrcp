@@ -23,6 +23,7 @@
 #include "I2CGLMaster.h"
 #include "I2CUtil.h"
 #include "../srcp/SRCPCommand.h"
+#include <wiring.h>
 
 namespace i2c
 {
@@ -37,7 +38,7 @@ I2CGLMaster::I2CGLMaster( int startAddr, int endAddr, int remoteAddr, srcp::SRCP
 
 int I2CGLMaster::set( int addr, int drivemode, int v, int v_max, int fn[] )
 {
-	uint8_t buf[7];
+	uint8_t buf[9];
 
 	buf[0] = srcp::GL;
 	buf[1] = srcp::SET;
@@ -45,9 +46,14 @@ int I2CGLMaster::set( int addr, int drivemode, int v, int v_max, int fn[] )
 	buf[4] = drivemode;
 	buf[5] = v;
 	buf[6] = v_max;
+	int f = 0;
+	for	( int i = 3; i < SRCP_MAX_ARGS; i++ )
+		bitWrite( f, i-3, fn[i] != 0 );
+	memcpy( &buf[7], &f, 2 );
 
-
-	// TODO fn abhandeln
+	// f0 und f1 - f12
+	char a[2];
+	memcpy( &a, &f, 2 );
 
 	return	( I2CUtil::write( this->addr, buf, sizeof(buf) ) );
 }

@@ -36,14 +36,25 @@ GLOpenDCC::GLOpenDCC( int startAddr, uint8_t endAddr, srcp::SRCPGenericLoco* nex
 
 int GLOpenDCC::set( int addr, int drivemode, int v, int v_max, int fn[] )
 {
+	// es sind nur Fahrstufen 0 - 127 moeglich, groessere Geschwindkeiten werden halbiert.
+	if	( v_max > 127 )
+	{
+		v /= 2;
+		v_max /= 2;
+	}
 	v = map( v, 0, v_max, 0, 127 );
 
 	if	( drivemode )
 		v |= 0x80;
 
-	// FIXME fn abhandeln und map ueberpruefen
-	do_loco_func_grp0( addr, 255 );	// Licht
-	do_loco_func_grp1( addr, 255 ); // F1 - F4
+	int f = bitRead( fn[3], 0 );
+	do_loco_func_grp0( addr, f );	// Licht
+	f = 0;
+	for	( int i = 1; i < 5; i++ )
+		bitWrite( f, i-1, bitRead(fn[3], i));
+	do_loco_func_grp1( addr, f ); // F1 - F4
+
+	// TODO F5 - F12 abhandeln
 	do_loco_speed( addr, v );
 
 	return	( 200 );

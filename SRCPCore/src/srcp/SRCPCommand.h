@@ -26,6 +26,8 @@
 
 #include <inttypes.h>
 
+#define SRCP_MAX_ARGS 15
+
 namespace srcp
 {
 
@@ -52,8 +54,8 @@ namespace srcp
 		int addr;
 		union
 		{
-			int values[10];
-			char args[20];
+			int values[SRCP_MAX_ARGS];
+			char args[SRCP_MAX_ARGS*2];
 		};
 	};
 

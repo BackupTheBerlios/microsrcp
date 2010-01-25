@@ -114,6 +114,7 @@ void SRCPSession::refresh()
 void SRCPSession::parse( char* args, int length )
 {
 	char d[10];
+	memset( cmd.values, 0, sizeof(cmd.values) );
 
 	cmd.cmd = UNKNOWN;
 	cmd.device = NA;
@@ -134,9 +135,11 @@ void SRCPSession::parse( char* args, int length )
 	}
 	else if (strncasecmp(args, "SET", 3) == 0)
 	{
-		// TODO variable Anzahl Argumente abhandeln, z.B. bei GL
+		// GL hat max. 12 (15 - 3) Funktionen, siehe SRCP_MAX_ARGS
 		cmd.cmd = SET;
-		sscanf( args, "%*s %d %s %d %d %d %d", &cmd.bus, d, &cmd.addr, &cmd.values[0], &cmd.values[1], &cmd.values[2] );
+		sscanf( args, "%*s %d %s %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &cmd.bus, d, &cmd.addr, &cmd.values[0], &cmd.values[1], &cmd.values[2],
+				&cmd.values[3], &cmd.values[4], &cmd.values[5], &cmd.values[6], &cmd.values[7], &cmd.values[8], &cmd.values[9],
+				&cmd.values[10], &cmd.values[11], &cmd.values[12], &cmd.values[13], &cmd.values[14] );
 		cmd.device = getDevice( d );
 	}
 	else if (strncasecmp(args, "GET", 3) == 0)
