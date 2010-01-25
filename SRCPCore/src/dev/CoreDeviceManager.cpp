@@ -26,8 +26,8 @@
 #include "GASignal.h"
 #include "GAServo.h"
 
-#include "GLAnalog293.h"
-#include "GLAFMotor.h"
+//#include "GLAnalog293.h"
+//#include "GLAFMotor.h"
 #include "GLArduinoMotor.h"
 
 #include "FBSwitchSensor.h"

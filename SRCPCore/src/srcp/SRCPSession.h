@@ -25,7 +25,6 @@
 #ifndef SRCPSESSION_H_
 #define SRCPSESSION_H_
 
-#include "WProgram.h"
 #include "SRCPPower.h"
 #include "SRCPFeedback.h"
 #include "SRCPGenericAccessoire.h"

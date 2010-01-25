@@ -22,6 +22,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <stdio.h>
 #include "SRCPSession.h"
 #include "SRCPMessages.h"
 
@@ -100,7 +101,7 @@ void SRCPSession::infoFeedback( Print* out )
 		for	( int i = 0; fb[i].pin != 0; i++ )
 		{
 			char* m = Messages.info( 0, "FB", fb[i].pin, fb[i].value );
-			Serial << "rc " << m << endl;
+			//Serial << "rc " << m << endl;
 			out->println( m );
 		}
 	}
