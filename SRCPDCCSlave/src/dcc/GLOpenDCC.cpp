@@ -27,7 +27,7 @@ extern "C"
 namespace dcc
 {
 
-GLOpenDCC::GLOpenDCC( int startAddr, uint8_t endAddr, srcp::SRCPGenericLoco* next )
+GLOpenDCC::GLOpenDCC( int startAddr, int endAddr, srcp::SRCPGenericLoco* next )
 {
 	this->startAddr = startAddr;
 	this->endAddr = endAddr;
@@ -46,6 +46,8 @@ int GLOpenDCC::set( int addr, int drivemode, int v, int v_max, int fn[] )
 
 	if	( drivemode )
 		v |= 0x80;
+
+	//Serial << "setGL addr=" << addr << ", v=" << v << endl;
 
 	int f = bitRead( fn[3], 0 );
 	do_loco_func_grp0( addr, f );	// Licht

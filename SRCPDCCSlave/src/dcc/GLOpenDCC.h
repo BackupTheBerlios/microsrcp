@@ -20,7 +20,7 @@ private:
 	int startAddr;
 	int endAddr;
 public:
-	GLOpenDCC( int startAddr, uint8_t endAddr, srcp::SRCPGenericLoco* next );
+	GLOpenDCC( int startAddr, int endAddr, srcp::SRCPGenericLoco* next );
 	int set( int addr, int drivemode, int v, int v_max, int fn[] );
 	int checkAddr( int addr ) { return ( addr >= startAddr && addr <= endAddr); }
 };

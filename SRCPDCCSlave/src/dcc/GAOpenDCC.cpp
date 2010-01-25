@@ -27,7 +27,7 @@ extern "C"
 namespace dcc
 {
 
-GAOpenDCC::GAOpenDCC( int startAddr, uint8_t endAddr, srcp::SRCPGenericAccessoire* next)
+GAOpenDCC::GAOpenDCC( int startAddr, int endAddr, srcp::SRCPGenericAccessoire* next)
 {
 	this->startAddr = startAddr;
 	this->endAddr = endAddr;
