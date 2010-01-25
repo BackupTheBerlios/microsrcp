@@ -19,6 +19,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <string.h>
 #include "I2CGAMaster.h"
 #include "I2CUtil.h"
 #include "../srcp/SRCPCommand.h"
@@ -36,13 +37,14 @@ I2CGAMaster::I2CGAMaster( int startAddr, int endAddr, int remoteAddr, srcp::SRCP
 
 int I2CGAMaster::set( int addr, int port, int value, int delay )
 {
-	uint8_t buf[6];
+	uint8_t buf[7];
 	buf[0] = srcp::GA;
 	buf[1] = srcp::SET;
-	buf[2] = addr - startAddr;
-	buf[3] = port;
-	buf[4] = value;
-	buf[5] = delay;
+	int a = addr - startAddr;
+	memcpy( &buf[2], &a, 2 );
+	buf[4] = port;
+	buf[5] = value;
+	buf[6] = delay;
 
 	return	( I2CUtil::write( this->addr, buf, sizeof(buf) ) );
 }

@@ -19,6 +19,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <string.h>
 #include "I2CGLMaster.h"
 #include "I2CUtil.h"
 #include "../srcp/SRCPCommand.h"
@@ -36,14 +37,15 @@ I2CGLMaster::I2CGLMaster( int startAddr, int endAddr, int remoteAddr, srcp::SRCP
 
 int I2CGLMaster::set( int addr, int drivemode, int v, int v_max, int fn[] )
 {
-	uint8_t buf[6];
+	uint8_t buf[7];
 
 	buf[0] = srcp::GL;
 	buf[1] = srcp::SET;
-	buf[2] = addr;
-	buf[3] = drivemode;
-	buf[4] = v;
-	buf[5] = v_max;
+	memcpy( &buf[2], &addr, 2 );
+	buf[4] = drivemode;
+	buf[5] = v;
+	buf[6] = v_max;
+
 
 	// TODO fn abhandeln
 

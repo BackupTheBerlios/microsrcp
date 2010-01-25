@@ -26,6 +26,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <string.h>
 #include "I2CServer.h"
 
 extern "C"
@@ -85,12 +86,12 @@ void I2CServer::dispatch(uint8_t* args, int size )
 {
 	cmd.device = (srcp::devices) ((args[0]));
 	cmd.cmd = (srcp::commands) ((args[1]));
-	cmd.addr = args[2];
+	memcpy( &cmd.addr, &args[2], 2 );
 
 	// FB Devices haben keine Argumente
 	if ( cmd.device != srcp::FB )
-		for ( int i = 3; i < size; i++ )
-			cmd.values[i - 3] = (int) ((args[i]));
+		for ( int i = 4; i < size; i++ )
+			cmd.values[i - 4] = (int) ((args[i]));
 
 	//Serial << "recv " << cmd.cmd << ", addr " << cmd.addr << ", dev " << cmd.device << endl;
 

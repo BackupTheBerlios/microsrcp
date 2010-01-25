@@ -19,6 +19,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <string.h>
 #include <WProgram.h>
 #include "I2CFBMaster.h"
 #include "I2CUtil.h"
@@ -37,11 +38,12 @@ I2CFBMaster::I2CFBMaster( int startAddr, int endAddr, int remoteAddr, srcp::SRCP
 
 int I2CFBMaster::info( int addr, srcp::feedback fb[] )
 {
-	uint8_t buf[3];
+	uint8_t buf[4];
 
 	buf[0] = srcp::FB;
 	buf[1] = srcp::GET;
-	buf[2] = this->addr - startAddr + 1;
+	int a = this->addr - startAddr + 1;
+	memcpy( &buf[2], &a, 2 );
 
 	int rc = I2CUtil::write( this->addr, buf, sizeof(buf) );
 	if	( rc != 200 )
