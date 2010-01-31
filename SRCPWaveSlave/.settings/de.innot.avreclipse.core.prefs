@@ -1,4 +1,4 @@
-#Sat Jan 30 21:09:35 CET 2010
+#Sat Jan 30 20:11:19 CET 2010
 avrtarget/ClockFrequency=16000000
 avrtarget/ExtRAMSize=0
 avrtarget/ExtendedRAM=false
@@ -11,17 +11,12 @@ avrtarget/avrdude/EEPROMFile=
 avrtarget/avrdude/EEPROMFromConfig=true
 avrtarget/avrdude/FlashFile=
 avrtarget/avrdude/FlashFromConfig=true
-avrtarget/avrdude/Fuses/ByteValues=0\:0\:0
-avrtarget/avrdude/Fuses/FileName=
-avrtarget/avrdude/Fuses/MCUid=atmega328p
-avrtarget/avrdude/Fuses/UseFile=false
-avrtarget/avrdude/Fuses/Write=false
 avrtarget/avrdude/NoChipErase=false
-avrtarget/avrdude/NoSigCheck=true
+avrtarget/avrdude/NoSigCheck=false
 avrtarget/avrdude/NoVerify=false
 avrtarget/avrdude/NoWrite=false
 avrtarget/avrdude/OtherOptions=
-avrtarget/avrdude/ProgrammerID=programmerconfig.5
+avrtarget/avrdude/ProgrammerID=programmerconfig.1
 avrtarget/avrdude/UseCounter=false
 avrtarget/avrdude/WriteEEPROM=false
 avrtarget/avrdude/WriteFlash=true

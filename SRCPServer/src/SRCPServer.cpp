@@ -47,6 +47,10 @@ srcp::device_config_t deviceConfig[] =
 		// Die SRCP Rueckmelder 1 - 8 befinden sich auf I2C Board 1
 		{ 1, 8, srcp::FB, srcp::I2CFBMaster, { 1 } },
 
+		////////////////////// Board 90 - 92 - Abspielen von Wave Dateien /////////////
+		// Die SRCP Adressen 100 - 199 werden an I2C Board 90 weitergeleitet
+		{ 100, 199, srcp::GA, srcp::I2CGAMaster, { 90 } },
+
 		////////////////////// Board 99 - OpenDCC //////////////////////////////////////////////////
 		// Loks mit der SRCP Adresse 10 bis 9999 werden an I2C Board 99 weitergeleitet
 		{ 10, 9999, srcp::GL, srcp::I2CGLMaster, { 99 } },
