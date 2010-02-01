@@ -3,9 +3,10 @@
 	Motortreiber Board.
 
 	Shield:
-	http://arduino.cc/en/Main/ArduinoMotorShield
+	http://arduino.cc/en/Main/ArduinoMotorShield oder
+	http://www.nkcelectronics.com/freeduino-arduino-motor-control-shield-kit.html
 
-	ACHTUNG: das die Arduino alle PWM Register neu initialisiert
+	ACHTUNG: das Arduino alle PWM Register neu initialisiert
 	kann dieser Treiber nicht mit Servos zusammen verwendet werden.
 
 	Copyright (c) 2010 Marcel Bernet.  All right reserved.
@@ -45,24 +46,8 @@ GLArduinoMotor::GLArduinoMotor( int addr, uint8_t pin, uint8_t dir, SRCPGenericL
 	pinMode( dir, OUTPUT );
 	digitalWrite( dir, HIGH );
 
-	// TODO anschauen ob unten nicht eine besser Loesung darstellt!
-	if	( pin == 10 )
-	{
-	    // use PWM from timer1A on PB2 (Arduino pin #10)
-	    TCCR1A |= _BV(COM1B1) | _BV(WGM10); // fast PWM, turn on oc1b
-	    // 0x05 statt 0x07 - gefunden in http://www.arduino.cc/playground/Code/PwmFrequency
-	    TCCR1B = MOTOR10_64KHZ & 0x5;
-	    OCR1B = 0;
-	    pinMode(10, OUTPUT);
-	}
-	else if ( pin == 11 )
-	{
-	    // use PWM from timer2A on PB3 (Arduino pin #11)
-	    TCCR2A |= _BV(COM2A1) | _BV(WGM20) | _BV(WGM21);// fast PWM, turn on oc2a
-	    TCCR2B = MOTOR11_64KHZ & 0x7;
-	    OCR2A = 0;
-	    pinMode(11, OUTPUT);
-	}
+	setPwmFrequency( pin, 1024 );
+	pinMode( pin, OUTPUT );
 }
 
 int GLArduinoMotor::set( int addr, int drivemode, int v, int v_max, int fn[] )
@@ -79,19 +64,8 @@ int GLArduinoMotor::set( int addr, int drivemode, int v, int v_max, int fn[] )
 	if ( v < 0 )
 		v = 0;
 
-
-	if	( pin == 10 )
-	{
-		// TODO wie gross ist der Timer 8 oder 16-bit?
-		v = map( v, 0, v_max, 0, 255 );
-	    OCR1B = v;
-	}
-	else if ( pin == 11 )
-	{
-		// TODO wie gross ist der Timer 8 oder 16-bit?
-		v = map( v, 0, v_max, 0, 255 );
-	    OCR2A = v;
-	}
+	v = map( v, 0, v_max, 0, 255 );
+	analogWrite( pin, v );
 
 	return (200);
 }
@@ -141,7 +115,7 @@ int GLArduinoMotor::set( int addr, int drivemode, int v, int v_max, int fn[] )
  * PWM frequency divisors. His post can be viewed at:
  *   http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1235060559/0#4
  */
-/*void setPwmFrequency( int pin, int divisor )
+void GLArduinoMotor::setPwmFrequency( int pin, int divisor )
 {
 	byte mode;
 	if ( pin == 5 || pin == 6 || pin == 9 || pin == 10 )
@@ -205,6 +179,6 @@ int GLArduinoMotor::set( int addr, int drivemode, int v, int v_max, int fn[] )
 		}
 		TCCR2B = TCCR2B & 0b11111000 | mode;
 	}
-}*/
+}
 
 }

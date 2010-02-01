@@ -3,9 +3,10 @@
 	Motortreiber Board.
 
 	Shield:
-	http://arduino.cc/en/Main/ArduinoMotorShield
+	http://arduino.cc/en/Main/ArduinoMotorShield oder
+	http://www.nkcelectronics.com/freeduino-arduino-motor-control-shield-kit.html
 
-	ACHTUNG: das die Arduino alle PWM Register neu initialisiert
+	ACHTUNG: das Arduino alle PWM Register neu initialisiert
 	kann dieser Treiber nicht mit Servos zusammen verwendet werden.
 
 	Copyright (c) 2010 Marcel Bernet.  All right reserved.
@@ -38,6 +39,7 @@ class GLArduinoMotor : public srcp::SRCPGenericLoco
 private:
 	uint8_t pin;
 	uint8_t dir;
+	void setPwmFrequency( int pin, int divisor );
 public:
 	GLArduinoMotor( int addr, uint8_t pin, uint8_t dir, SRCPGenericLoco* next );
 	int set( int addr, int drivemode, int v, int v_max, int fn[] );

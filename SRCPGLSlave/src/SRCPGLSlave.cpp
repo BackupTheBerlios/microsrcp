@@ -3,7 +3,8 @@
 
 	Bestehend aus:
 	- Arduino Board mit min. ATmega168p - http://www.arduino.cc
-	- Motor Shield - http://arduino.cc/en/Main/ArduinoMotorShield
+	- Motor Shield - http://arduino.cc/en/Main/ArduinoMotorShield oder
+	http://www.nkcelectronics.com/freeduino-arduino-motor-control-shield-kit.html
 
 	Copyright (c) 2010 Marcel Bernet.  All right reserved.
 
@@ -33,22 +34,22 @@
 // Definition der lokalen Geraete
 srcp::device_config_t deviceConfig[] =
 	{
-		// SRCP Adresse 3 - Arduino http://arduino.cc/en/Main/ArduinoMotorShield - Pin 10 Geschwindigkeit, Pin 12 Laufrichtung
-		{ 3, 0, srcp::GL, srcp::GLArduinoMotor , { 10, 12 } },
-		// SRCP Adresse 3 - Arduino http://arduino.cc/en/Main/ArduinoMotorShield - Pin 11 Geschwindigkeit, Pin 13 Laufrichtung
-		{ 4, 0, srcp::GL, srcp::GLArduinoMotor , { 11, 13 } },
+		// SRCP Adresse 3 - Arduino http://arduino.cc/en/Main/ArduinoMotorShield - Pin 10 Geschwindigkeit, Pin 13 Laufrichtung
+		{ 3, 0, srcp::GL, srcp::GLArduinoMotor , { 10, 13 } },
+		// SRCP Adresse 3 - Arduino http://arduino.cc/en/Main/ArduinoMotorShield - Pin  9 Geschwindigkeit, Pin 12 Laufrichtung
+		{ 4, 0, srcp::GL, srcp::GLArduinoMotor , { 9, 12 } },
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
 	};
 
 void setup()
 {
-	//Serial.begin(19200);
+	Serial.begin(19200);
 
 	WireServer.addDeviceManager( new dev::CoreDeviceManager() );
 	WireServer.begin( MY_ADDR, deviceConfig );
 
-	//Serial << "listen" << endl;
+	Serial << "listen" << endl;
 }
 
 void loop()
