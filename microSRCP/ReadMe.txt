@@ -6,6 +6,10 @@ Arduino IDE
 patch/WMemory.cpp in Verzeichnis hardware/cores/arduino der
 Arduino IDE kopieren.
 
+Und patch/AF_Wave in hardware/libraries/AF_Wave kopieren
+nachdem die AF_Wave Library dorthin kopiert wurde!
+(umschliesst wave.h mit #ifdef #endif).
+
 skeetbook-Verzeichnis Inhalte in Arduino Skeetbook-
 Verzeichnis kopieren. (siehe File -> Preferences in der 
 Arduino IDE).
@@ -59,4 +63,4 @@ beantworten. Kontaktaufnahme bitte per mail und nicht per Telefon.
 Bitte bei Problemen möglichst exakt schildern, was wie schief geht, 
 am besten mit logfiles bzw. exakter Fehlermeldung. 
 
-17. Januar 2010 / Marcel Bernet
+1. Februar 2010 / Marcel Bernet

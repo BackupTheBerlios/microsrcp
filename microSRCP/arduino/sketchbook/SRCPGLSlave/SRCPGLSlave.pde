@@ -31,15 +31,15 @@
 #define MY_ADDR	100
 
 // Definition der lokalen Geraete
-srcp::device_config_t deviceConfig[] = 
-{ 
-  // SRCP Adresse 3 - Arduino http://arduino.cc/en/Main/ArduinoMotorShield - Pin 10 Geschwindigkeit, Pin 12 Laufrichtung
-  { 3, 0, srcp::GL, srcp::GLArduinoMotor , { 10, 12 } },	
-  // SRCP Adresse 4 - Arduino http://arduino.cc/en/Main/ArduinoMotorShield - Pin 11 Geschwindigkeit, Pin 13 Laufrichtung  
-  { 4, 0, srcp::GL, srcp::GLArduinoMotor , { 11, 13 } },
-  // EOF Geraete - nicht vergessen!
-  { -1 },
-};
+srcp::device_config_t deviceConfig[] =
+	{
+		// SRCP Adresse 3 - Arduino http://arduino.cc/en/Main/ArduinoMotorShield - Pin 10 Geschwindigkeit, Pin 13 Laufrichtung
+		{ 3, 0, srcp::GL, srcp::GLArduinoMotor , { 10, 13 } },
+		// SRCP Adresse 3 - Arduino http://arduino.cc/en/Main/ArduinoMotorShield - Pin  9 Geschwindigkeit, Pin 12 Laufrichtung
+		{ 4, 0, srcp::GL, srcp::GLArduinoMotor , { 9, 12 } },
+		// EOF Geraete - nicht vergessen!
+		{ -1 },
+	};
 
 void setup()
 {

@@ -23,6 +23,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+#include <stddef.h>
 #include <Servo.h>
 #include <Ethernet.h>
 #include <I2CUtil.h>
@@ -32,6 +33,7 @@
 #include <ServerSocket.h>
 #include <CoreDeviceManager.h>
 
+
 // network configuration.  gateway and subnet are optional.
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 241 };
@@ -39,17 +41,28 @@ byte ip[] = { 192, 168, 1, 241 };
 // Definition der I2C Boards - muss fuer weitere Boards erweitert werden.
 srcp::device_config_t deviceConfig[] =
 	{
-		////////////////////// Board 1 //////////////////////////////////////////
+		////////////////////// Board 1 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
 		// Die SRCP Adressen 32 - 63 werden an I2C Board 1 weitergeleitet
 		{ 32, 63, srcp::GA, srcp::I2CGAMaster, { 1 } },
 		// Die SRCP Adressen 64 - 96 werden an I2C Board 1 weitergeleitet
 		{ 64, 96, srcp::GA, srcp::I2CGAMaster, { 1 } },
 		// Die SRCP Rueckmelder 1 - 8 befinden sich auf I2C Board 1
 		{ 1, 8, srcp::FB, srcp::I2CFBMaster, { 1 } },
-		// Loks mit der SRCP Adresse 3 und 4 werden an I2C Board 100 weitergeleitet
 
-		////////////////////// Board 100 //////////////////////////////////////////
+		////////////////////// Board 90 - 92 - Abspielen von Wave Dateien /////////////
+		// Die SRCP Adressen 100 - 199 werden an I2C Board 90 weitergeleitet
+		{ 100, 199, srcp::GA, srcp::I2CGAMaster, { 90 } },
+
+		////////////////////// Board 99 - OpenDCC //////////////////////////////////////////////////
+		// Loks mit der SRCP Adresse 10 bis 9999 werden an I2C Board 99 weitergeleitet
+		{ 10, 9999, srcp::GL, srcp::I2CGLMaster, { 99 } },
+		// Zubehoer mit der SRCP Adresse 1 und 999 werden an I2C Board 99 weitergeleitet
+		{  1,  999, srcp::GA, srcp::I2CGAMaster, { 99 } },
+
+		////////////////////// Board 100 - Motorentreiber //////////////////////////////////////////
+		// Loks mit der SRCP Adresse 3 und 4 werden an I2C Board 100 weitergeleitet
 		{ 3, 4, srcp::GL, srcp::I2CGLMaster, { 100 } },
+
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
 	};
