@@ -35,11 +35,11 @@ namespace srcp
  *	6xx ERROR: Ein serverspezifischer Fehlerzustand ist aufgetreten. Der betreffende Befehl wird nicht ausgeführt. Details sind der Serverdokumentation zu entnehmen.
  */
 
-const char VERSION[] = "srcpd V1.0; SRCP 0.8.2";
-const char INFO[] = "%ld 100 INFO %d %s %d %d";
-const char OK[] = "%ld %d OK";
-const char GO[] = "%ld 200 OK GO %d";
-const char ERROR[] = "%ld %d ERROR";
+char VERSION[] = "srcpd V1.0; SRCP 0.8.2\n";
+const char INFO[] = "%ld 100 INFO %d %s %d %d\n";
+const char OK[] = "%ld %d OK\n";
+const char GO[] = "%ld 200 OK GO %d\n";
+const char ERROR[] = "%ld %d ERROR\n";
 
 /**
  400 ERROR Protokoll wird nicht unterstuetzt
