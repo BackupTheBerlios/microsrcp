@@ -38,8 +38,9 @@
 <option id="de.innot.avreclipse.cppcompiler.option.debug.level.1351244746" name="Generate Debugging Info" superClass="de.innot.avreclipse.cppcompiler.option.debug.level" value="de.innot.avreclipse.cppcompiler.option.debug.level.none" valueType="enumerated"/>
 <option id="de.innot.avreclipse.cppcompiler.option.optimize.88990437" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize" value="de.innot.avreclipse.cppcompiler.optimize.size" valueType="enumerated"/>
 <option id="de.innot.avreclipse.cppcompiler.option.incpath.805978717" name="Include Paths (-I)" superClass="de.innot.avreclipse.cppcompiler.option.incpath" valueType="includePath">
-<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduino8-0017/include}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SRCPWaveSlave/src/wav}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/SRCPCore/src}&quot;"/>
+<listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduino8-0017/include}&quot;"/>
 </option>
 <inputType id="de.innot.avreclipse.cppcompiler.input.1907814302" superClass="de.innot.avreclipse.cppcompiler.input"/>
 </tool>
@@ -481,6 +482,8 @@
 </scannerConfigBuildInfo>
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cconfiguration>
 </storageModule>
 <storageModule moduleId="cdtBuildSystem" version="4.0.0">
