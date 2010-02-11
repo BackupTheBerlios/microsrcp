@@ -42,7 +42,7 @@ int I2CFBMaster::info( int addr, srcp::feedback fb[] )
 
 	buf[0] = srcp::FB;
 	buf[1] = srcp::GET;
-	int a = this->addr - startAddr + 1;
+	int a = this->addr;
 	memcpy( &buf[2], &a, 2 );
 
 	int rc = I2CUtil::write( this->addr, buf, sizeof(buf) );
@@ -60,7 +60,7 @@ int I2CFBMaster::info( int addr, srcp::feedback fb[] )
 	for	( int i = 0; i < 8; i++ )
 		if	( bitRead(oldSensor, i) != bitRead(sensor,i) )
 		{
-			fb[pos].pin = i + this->addr;
+			fb[pos].pin = i + this->startAddr;
 			fb[pos].value = bitRead(sensor, i);
 			pos++;
 		}
