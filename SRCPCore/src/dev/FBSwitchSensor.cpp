@@ -45,7 +45,7 @@ FBSwitchSensor::FBSwitchSensor( int addr, uint8_t startPin, uint8_t endPin, srcp
 	}
 
 	oldSensor = 0;
-	sensor = 0;
+	sensor = 0b11111111;
 }
 
 void FBSwitchSensor::refresh( )
