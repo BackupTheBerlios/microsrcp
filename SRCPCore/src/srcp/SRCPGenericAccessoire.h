@@ -38,6 +38,8 @@ public:
 	virtual int get( int addr, int port ) { return ( 423 ); }
 	virtual int set( int addr, int port, int value, int delay ) { return ( 423 ); }
 	virtual void setPower( int on ) {}
+	virtual int setSM( int bus, int addr, int cv, int value ) { return( 200 ); }
+	virtual int getSM( int bus, int addr, int cv ) { return( -1 ); };
 };
 }
 

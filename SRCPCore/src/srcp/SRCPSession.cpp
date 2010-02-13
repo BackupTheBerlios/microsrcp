@@ -52,6 +52,15 @@ char* SRCPSession::dispatch(char* args, int length )
 			power = ON;
 			return	( Messages.go( counter++ ));
 		case GET:
+			switch (cmd.device)
+			{
+				case SM:
+					int rc = manager->getSM( cmd.bus, cmd.addr, cmd.values[0] );
+					if	( rc == -1 )
+						return	( Messages.error( 421 ) );
+					return	( Messages.info( cmd.bus, cmd.addr, cmd.values[0], rc ));
+			}
+
 			return (Messages.ok());
 		case SET:
 			switch (cmd.device)
@@ -70,6 +79,10 @@ char* SRCPSession::dispatch(char* args, int length )
 
 				case GL:
 					cmd.values[0] = manager->setGL( cmd.addr, cmd.values[0], cmd.values[1], cmd.values[2], cmd.values );
+					return (Messages.ok());
+
+				case SM:
+					manager->setSM( cmd.bus, cmd.addr, cmd.values[0], cmd.values[1] );
 					return (Messages.ok());
 
 				default:
@@ -141,23 +154,45 @@ void SRCPSession::parse( char* args, int length )
 	{
 		// GL hat max. 12 (15 - 3) Funktionen, siehe SRCP_MAX_ARGS
 		cmd.cmd = SET;
-		sscanf( args, "%*s %d %s %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &cmd.bus, d, &cmd.addr, &cmd.values[0], &cmd.values[1], &cmd.values[2],
-				&cmd.values[3], &cmd.values[4], &cmd.values[5], &cmd.values[6], &cmd.values[7], &cmd.values[8], &cmd.values[9],
-				&cmd.values[10], &cmd.values[11], &cmd.values[12], &cmd.values[13], &cmd.values[14] );
+		// Bus, Devices, Adresse sind immer vorhanden.
+		sscanf( args, "%*s %d %s %d", &cmd.bus, d, &cmd.addr );
 		cmd.device = getDevice( d );
 
-		if	( cmd.device == POWER )
+		switch	( cmd.device )
 		{
-			sscanf( args,  "%*s %*d %*s %s", cmd.args );
-			if	( strncasecmp( cmd.args, "ON", 2) == 0 )
-				cmd.values[0] = ON;
-			else
-				cmd.values[0] = OFF;
+			case	POWER:
+				sscanf( args,  "%*s %*d %*s %s", cmd.args );
+				if	( strncasecmp( cmd.args, "ON", 2) == 0 )
+					cmd.values[0] = ON;
+				else
+					cmd.values[0] = OFF;
+				break;
+
+			case	SM:
+				sscanf( args, "%*s %*d %*s %*d %*s %d %d", &cmd.values[0], &cmd.values[1] );
+				break;
+
+			// GL, GA
+			default:
+				sscanf( args, "%*s %*d %*s %*d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", &cmd.values[0], &cmd.values[1], &cmd.values[2],
+						&cmd.values[3], &cmd.values[4], &cmd.values[5], &cmd.values[6], &cmd.values[7], &cmd.values[8], &cmd.values[9],
+						&cmd.values[10], &cmd.values[11], &cmd.values[12], &cmd.values[13], &cmd.values[14] );
+				break;
 		}
 	}
 	else if (strncasecmp(args, "GET", 3) == 0)
 	{
 		cmd.cmd = GET;
+		// Bus, Devices, Adresse sind immer vorhanden.
+		sscanf( args, "%*s %d %s %d", &cmd.bus, d, &cmd.addr );
+		cmd.device = getDevice( d );
+
+		switch	( cmd.device )
+		{
+			case SM:
+				sscanf( args, "%*s %*d %*s %*d %*s %d", &cmd.values[0] );
+				break;
+		}
 	}
 	else if (strncasecmp(args, "WAIT", 4) == 0)
 		cmd.cmd = WAIT;
@@ -181,6 +216,8 @@ devices SRCPSession::getDevice( char* device )
 		return	( GA );
 	else if	( strncasecmp(device, "GL", 2) == 0 )
 		return	( GL );
+	else if	( strncasecmp(device, "SM", 2) == 0 )
+		return	( SM );
 
 	return	( NA );
 }

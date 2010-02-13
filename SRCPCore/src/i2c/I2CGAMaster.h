@@ -37,6 +37,8 @@ public:
 	int checkAddr( int addr ) { return ( addr >= startAddr && addr <= endAddr); }
 	int set( int addr, int port, int value, int delay  );
 	void setPower( int on );
+	int setSM( int bus, int addr, int cv, int value );
+	int getSM( int bus, int addr, int cv );
 };
 
 }

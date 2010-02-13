@@ -37,6 +37,7 @@
  */
 
 #include "SRCPDeviceMaster.h"
+#include <EEPROM.h>
 
 namespace srcp
 {
@@ -64,7 +65,6 @@ void SRCPDeviceMaster::init( device_config_t deviceConfig[] )
 				}
 				break;
 			case GL:
-
 				for	( manager = firstManager; manager != 0; manager = manager->getNextManager() )
 				{
 					SRCPGenericLoco* ngl = manager->createGL( deviceConfig[i], firstGL );
@@ -142,6 +142,42 @@ void SRCPDeviceMaster::setPower( int on )
 
 	for	( SRCPGenericLoco* n = firstGLElement(); n != 0; n = n->nextElement() )
 		n->setPower( on );
+}
+
+int SRCPDeviceMaster::setSM( int bus, int addr, int cv, int value )
+{
+	// Zentrale?
+	if	( addr == 0 && bus == 0 )
+	{
+		EEPROM.write( cv, value );
+		return	( 200 );
+	}
+
+	for	( SRCPGenericAccessoire* n = firstGAElement(); n != 0; n = n->nextElement() )
+		n->setSM( bus, addr, cv, value );
+
+	for	( SRCPGenericLoco* n = firstGLElement(); n != 0; n = n->nextElement() )
+		n->setSM( bus, addr, cv, value );
+
+	return	( 200 );
+}
+
+int SRCPDeviceMaster::getSM( int bus, int addr, int cv )
+{
+	// Zentrale?
+	if	( addr == 0 && bus == 0 )
+		return	( EEPROM.read( cv ) );
+
+	int rc = -1;
+	for	( SRCPGenericAccessoire* n = firstGAElement(); n != 0; n = n->nextElement() )
+		if	( (rc = n->getSM( bus, addr, cv ) ) != -1 )
+			return	( rc );
+
+	for	( SRCPGenericLoco* n = firstGLElement(); n != 0; n = n->nextElement() )
+		if	( (rc = n->getSM( bus, addr, cv ) ) != -1 )
+			return	( rc );
+
+	return	( -1 );
 }
 
 SRCPDeviceMaster::~SRCPDeviceMaster()

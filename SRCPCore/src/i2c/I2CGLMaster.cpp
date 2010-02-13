@@ -67,4 +67,46 @@ void I2CGLMaster::setPower( int on )
 
 	I2CUtil::write( this->addr, buf, sizeof(buf) );
 }
+
+int I2CGLMaster::setSM( int bus, int addr, int cv, int value )
+{
+	uint8_t buf[7];
+	buf[0] = srcp::SM;
+	buf[1] = srcp::SET;
+	int a = 0;
+	// nicht Board Eeprom aendern?
+	if	( bus != 0 )
+		a = addr;
+	memcpy( &buf[2], &a, 2 );
+	buf[4] = bus;
+	buf[5] = cv;
+	buf[6] = value;
+
+	return	( I2CUtil::write( this->addr, buf, sizeof(buf) ) );
+}
+
+int I2CGLMaster::getSM( int bus, int addr, int cv )
+{
+	uint8_t buf[6];
+	buf[0] = srcp::SM;
+	buf[1] = srcp::GET;
+	int a = 0;
+	// nicht Board Eeprom aendern?
+	if	( bus != 0 )
+		a = addr;
+	memcpy( &buf[2], &a, 2 );
+	buf[4] = bus;
+	buf[5] = cv;
+
+	int rc = I2CUtil::write( this->addr, buf, sizeof(buf) );
+	if	( rc != 200 )
+		return	( -1 );
+
+	rc = I2CUtil::read( this->addr, buf, 1 );
+	if	( rc != 200 )
+		return	( -1 );
+
+	return	( buf[0] );
+}
+
 }

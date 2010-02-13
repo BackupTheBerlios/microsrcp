@@ -37,6 +37,7 @@ namespace srcp
 
 char VERSION[] = "srcpd V1.0; SRCP 0.8.2\n";
 const char INFO[] = "%ld 100 INFO %d %s %d %d\n";
+const char INFO_SM[] = "%ld 100 INFO %d SM %d GET %d %d\n";
 const char OK[] = "%ld %d OK\n";
 const char GO[] = "%ld 200 OK GO %d\n";
 const char ERROR[] = "%ld %d ERROR\n";
@@ -98,6 +99,11 @@ char* SRCPMessages::go(int clientId)
 char* SRCPMessages::info( int port, char* device, int addr, int value )
 {
 	sprintf(buf, INFO, millis(), port, device, addr, value );
+	return (buf);
+}
+char* SRCPMessages::info( int bus, int addr, int cv, int value )
+{
+	sprintf(buf, INFO_SM, millis(), bus, addr, cv, value );
 	return (buf);
 }
 

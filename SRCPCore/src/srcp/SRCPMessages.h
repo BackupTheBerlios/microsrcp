@@ -36,6 +36,7 @@ public:
 	char* ok202();
 	char* go(int clientId);
 	char* info( int port, char* device, int addr, int value);
+	char* info( int bus, int addr, int cv, int value );
 	const char *version ();
 };
 

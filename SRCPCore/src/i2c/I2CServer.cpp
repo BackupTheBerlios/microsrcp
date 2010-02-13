@@ -42,7 +42,7 @@ namespace i2c
 {
 
 /**
- * Empfange Daten von I2C Master
+ * Empfange Daten von I2C Master - Abhandlung SRCP SET fuer alle anderen nur abstellen der Argumente
  */
 void I2CServer::slaveRxEvent( uint8_t* rxBuf, int size )
 {
@@ -50,7 +50,7 @@ void I2CServer::slaveRxEvent( uint8_t* rxBuf, int size )
 }
 
 /**
- * Sende Daten an I2C Master
+ * Sende Daten an I2C Master - Abhandlung SRCP GET (mit Argumenten aus WireServer.dispatch)
  */
 void I2CServer::slaveTxEvent()
 {
@@ -62,7 +62,6 @@ void I2CServer::slaveTxEvent()
 		//		<< ", rc " << (int) WireServer.cmd.args[0] << endl;
 		twi_transmit( (uint8_t*) WireServer.cmd.args, len );
 	}
-
 }
 
 I2CServer::I2CServer()
@@ -112,6 +111,10 @@ void I2CServer::dispatch(uint8_t* args, int size )
 					cmd.values[0] = manager->setGL( cmd.addr, cmd.values[0], cmd.values[1], cmd.values[2], cmd.values );
 					break;
 
+				case srcp::SM:
+					manager->setSM( cmd.values[0], cmd.addr, cmd.values[1], cmd.values[2] );
+					break;
+
 				default:
 					break;
 			}
@@ -119,7 +122,6 @@ void I2CServer::dispatch(uint8_t* args, int size )
 		default:
 			break;
 	}
-
 }
 
 int I2CServer::dispatchTx()
@@ -132,6 +134,10 @@ int I2CServer::dispatchTx()
 				case srcp::FB:
 					cmd.args[0] = manager->getFB( cmd.addr );
 					return	( 1 );
+
+				case srcp::SM:
+					cmd.args[0] = manager->getSM( cmd.values[0], cmd.addr, cmd.values[1] );
+					return ( 1 );
 				default:
 					break;
 			}
