@@ -34,6 +34,7 @@ extern "C"
 #include <avr/eeprom.h>
 #include <string.h>
 
+#include "hardware.h"
 #include "config.h"                // general structures and definitions - make your changes here
 #include "parser.h"
 #include "dccout.h"                // make dcc
@@ -41,6 +42,7 @@ extern "C"
 }
 #include "GLOpenDCC.h"
 #include <WProgram.h>
+#include <srcp/SRCPSession.h>
 
 namespace dcc
 {
@@ -78,6 +80,23 @@ int GLOpenDCC::set( int addr, int drivemode, int v, int v_max, int fn[] )
 	do_loco_speed( addr, v );
 
 	return	( 200 );
+}
+
+void GLOpenDCC::setPower( int on )
+{
+	Serial << "power gl" << on << endl;
+	if	( on == srcp::ON )
+	{
+		// TODO warum funktioniert On/Off via Pin nicht?
+		MAIN_TRACK_ON;
+		organizer_halt_state = 0;
+	}
+	else
+	{
+		// TODO warum funktioniert On/Off via Pin nicht?
+		MAIN_TRACK_OFF;
+		do_all_stop();
+	}
 }
 
 }

@@ -76,7 +76,6 @@ private:
 	SRCPDeviceManager *firstManager;
 	SRCPGenericAccessoire *firstGA;
 	SRCPGenericLoco *firstGL;
-	SRCPPower *firstPower;
 	SRCPFeedback *firstFB;
 	device_config_t deviceConfig[];
 public:
@@ -85,7 +84,6 @@ public:
 	/** um alle Element zu transfersieren ohne Eingrenzung, anschliessend mit ga->next() weiterlesen */
 	SRCPGenericAccessoire* firstGAElement() { return( firstGA ); }
 	SRCPGenericLoco* firstGLElement() { return( firstGL ); }
-	SRCPPower* firstPowerElement() { return( firstPower ); }
 	SRCPFeedback* firstFeedbackElement() { return( firstFB ); }
 	void addDeviceManager( SRCPDeviceManager *manager ) { manager->setNextManager( firstManager ); firstManager = manager; }
 	void init( device_config_t deviceConfig[] );
@@ -93,7 +91,7 @@ public:
 	int setGL( int addr, int drivemode, int v, int v_max, int fn[] );
 	void refresh();
 	int getFB( int addr );
-
+	void setPower( int on );
 };
 
 }

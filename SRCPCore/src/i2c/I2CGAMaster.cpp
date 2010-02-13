@@ -49,4 +49,14 @@ int I2CGAMaster::set( int addr, int port, int value, int delay )
 	return	( I2CUtil::write( this->addr, buf, sizeof(buf) ) );
 }
 
+void I2CGAMaster::setPower( int on )
+{
+	uint8_t buf[4];
+	buf[0] = srcp::POWER;
+	buf[1] = srcp::SET;
+	memcpy( &buf[2], &on, 2 );
+
+	I2CUtil::write( this->addr, buf, sizeof(buf) );
+}
+
 }

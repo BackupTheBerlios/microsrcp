@@ -40,6 +40,7 @@ public:
 	virtual int checkAddr( int addr ) { return( this->addr == addr ); }
 	virtual int get( int addr, int port ) { return ( 423 ); }
 	virtual int set( int addr, int drivemode, int v, int v_max, int fn[] ) { return ( 423 ); }
+	virtual void setPower( int on ) {}
 };
 }
 

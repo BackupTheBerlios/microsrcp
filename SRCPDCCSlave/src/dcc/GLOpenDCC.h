@@ -41,6 +41,7 @@ public:
 	GLOpenDCC( int startAddr, int endAddr, srcp::SRCPGenericLoco* next );
 	int set( int addr, int drivemode, int v, int v_max, int fn[] );
 	int checkAddr( int addr ) { return ( addr >= startAddr && addr <= endAddr); }
+	void setPower( int on );
 };
 
 }

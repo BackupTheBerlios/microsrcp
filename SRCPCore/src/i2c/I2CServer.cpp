@@ -88,8 +88,8 @@ void I2CServer::dispatch(uint8_t* args, int size )
 	cmd.cmd = (srcp::commands) ((args[1]));
 	memcpy( &cmd.addr, &args[2], 2 );
 
-	// FB Devices haben keine Argumente
-	if ( cmd.device != srcp::FB )
+	// FB und Power Devices haben keine Argumente
+	if ( cmd.device != srcp::FB && cmd.device != srcp::POWER )
 		for ( int i = 4; i < size; i++ )
 			cmd.values[i - 4] = (int) ((args[i]));
 
@@ -100,6 +100,10 @@ void I2CServer::dispatch(uint8_t* args, int size )
 		case srcp::SET:
 			switch (cmd.device)
 			{
+				case srcp::POWER:
+					manager->setPower( cmd.addr );
+					break;
+
 				case srcp::GA:
 					cmd.values[0] = manager->setGA( cmd.addr, cmd.values[0], cmd.values[1], cmd.values[2] );
 					break;

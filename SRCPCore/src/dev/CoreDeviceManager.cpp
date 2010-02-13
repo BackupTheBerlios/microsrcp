@@ -68,12 +68,6 @@ srcp::SRCPGenericLoco* CoreDeviceManager::createGL( srcp::device_config_t config
 
 }
 
-srcp::SRCPPower* CoreDeviceManager::createPower( srcp::device_config_t config, srcp::SRCPPower* next )
-{
-	return	( 0 );
-
-}
-
 srcp::SRCPFeedback* CoreDeviceManager::createFB( srcp::device_config_t config, srcp::SRCPFeedback* next )
 {
 	switch ( config.subDevice )

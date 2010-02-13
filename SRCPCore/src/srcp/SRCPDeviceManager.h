@@ -25,7 +25,6 @@
 #define SRCPDEVICEMANAGER_H_
 
 #include "SRCPCommand.h"
-#include "SRCPPower.h"
 #include "SRCPFeedback.h"
 #include "SRCPGenericAccessoire.h"
 #include "SRCPGenericLoco.h"
@@ -40,7 +39,6 @@ protected:
 public:
 	virtual SRCPGenericAccessoire* createGA( device_config_t config, SRCPGenericAccessoire* next ) { return(0); }
 	virtual SRCPGenericLoco* createGL( device_config_t config, SRCPGenericLoco* next ) { return(0); }
-	virtual SRCPPower* createPower( device_config_t config, SRCPPower* next ) { return(0); }
 	virtual SRCPFeedback* createFB( device_config_t config, SRCPFeedback* next ) { return(0); }
 	void setNextManager( SRCPDeviceManager *next ) { this->next = next; }
 	SRCPDeviceManager* getNextManager() { return ( next ); }

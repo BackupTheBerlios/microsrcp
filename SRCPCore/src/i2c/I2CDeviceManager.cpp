@@ -53,12 +53,6 @@ srcp::SRCPGenericLoco* I2CDeviceManager::createGL( srcp::device_config_t config,
 
 }
 
-srcp::SRCPPower* I2CDeviceManager::createPower( srcp::device_config_t config, srcp::SRCPPower* next )
-{
-	return	( 0 );
-
-}
-
 srcp::SRCPFeedback* I2CDeviceManager::createFB( srcp::device_config_t config, srcp::SRCPFeedback* next )
 {
 	switch ( config.subDevice )

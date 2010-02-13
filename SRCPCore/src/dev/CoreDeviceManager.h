@@ -34,7 +34,6 @@ public:
 	CoreDeviceManager() { next = 0; }
 	srcp::SRCPGenericAccessoire* createGA( srcp::device_config_t config, srcp::SRCPGenericAccessoire* next );
 	srcp::SRCPGenericLoco* createGL( srcp::device_config_t config, srcp::SRCPGenericLoco* next );
-	srcp::SRCPPower* createPower( srcp::device_config_t config, srcp::SRCPPower* next );
 	srcp::SRCPFeedback* createFB( srcp::device_config_t config, srcp::SRCPFeedback* next );
 };
 

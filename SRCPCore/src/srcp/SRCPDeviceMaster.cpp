@@ -45,7 +45,6 @@ void SRCPDeviceMaster::init( device_config_t deviceConfig[] )
 {
 	firstGA = 0;
 	firstGL = 0;
-	firstPower = 0;
 	firstFB = 0;
 	SRCPDeviceManager* manager;
 
@@ -72,17 +71,6 @@ void SRCPDeviceMaster::init( device_config_t deviceConfig[] )
 					if ( ngl != 0 )
 					{
 						firstGL = ngl;
-						break;
-					}
-				}
-				break;
-			case POWER:
-				for	( manager = firstManager; manager != 0; manager = manager->getNextManager() )
-				{
-					SRCPPower* npower = manager->createPower( deviceConfig[i], firstPower );
-					if ( npower != 0 )
-					{
-						firstPower = npower;
 						break;
 					}
 				}
@@ -145,6 +133,15 @@ int SRCPDeviceMaster::getFB( int addr )
 		return	( f->get( addr ));
 	}
 	return	( 0 );
+}
+
+void SRCPDeviceMaster::setPower( int on )
+{
+	for	( SRCPGenericAccessoire* n = firstGAElement(); n != 0; n = n->nextElement() )
+		n->setPower( on );
+
+	for	( SRCPGenericLoco* n = firstGLElement(); n != 0; n = n->nextElement() )
+		n->setPower( on );
 }
 
 SRCPDeviceMaster::~SRCPDeviceMaster()

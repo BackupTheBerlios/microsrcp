@@ -36,6 +36,7 @@ public:
 	I2CGAMaster( int startAddr, int endAddr, int remoteAddr, srcp::SRCPGenericAccessoire* next );
 	int checkAddr( int addr ) { return ( addr >= startAddr && addr <= endAddr); }
 	int set( int addr, int port, int value, int delay  );
+	void setPower( int on );
 };
 
 }

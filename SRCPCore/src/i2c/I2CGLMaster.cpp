@@ -57,4 +57,14 @@ int I2CGLMaster::set( int addr, int drivemode, int v, int v_max, int fn[] )
 
 	return	( I2CUtil::write( this->addr, buf, sizeof(buf) ) );
 }
+
+void I2CGLMaster::setPower( int on )
+{
+	uint8_t buf[4];
+	buf[0] = srcp::POWER;
+	buf[1] = srcp::SET;
+	memcpy( &buf[2], &on, 2 );
+
+	I2CUtil::write( this->addr, buf, sizeof(buf) );
+}
 }

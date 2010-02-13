@@ -36,6 +36,7 @@ public:
 	I2CGLMaster( int startAddr, int endAddr, int remoteAddr, srcp::SRCPGenericLoco* next );
 	int checkAddr( int addr ) { return ( addr >= startAddr && addr <= endAddr); }
 	int set( int addr, int drivemode, int v, int v_max, int fn[] );
+	void setPower( int on );
 };
 
 }

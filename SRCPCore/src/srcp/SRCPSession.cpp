@@ -57,7 +57,10 @@ char* SRCPSession::dispatch(char* args, int length )
 			switch (cmd.device)
 			{
 				case POWER:
+					power = (power_enum) cmd.values[0];
+					manager->setPower( power );
 					return (Messages.ok());
+
 				case FB:
 					return (Messages.ok());
 
@@ -142,6 +145,15 @@ void SRCPSession::parse( char* args, int length )
 				&cmd.values[3], &cmd.values[4], &cmd.values[5], &cmd.values[6], &cmd.values[7], &cmd.values[8], &cmd.values[9],
 				&cmd.values[10], &cmd.values[11], &cmd.values[12], &cmd.values[13], &cmd.values[14] );
 		cmd.device = getDevice( d );
+
+		if	( cmd.device == POWER )
+		{
+			sscanf( args,  "%*s %*d %*s %s", cmd.args );
+			if	( strncasecmp( cmd.args, "ON", 2) == 0 )
+				cmd.values[0] = ON;
+			else
+				cmd.values[0] = OFF;
+		}
 	}
 	else if (strncasecmp(args, "GET", 3) == 0)
 	{
