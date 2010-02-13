@@ -84,7 +84,6 @@ int GLOpenDCC::set( int addr, int drivemode, int v, int v_max, int fn[] )
 
 void GLOpenDCC::setPower( int on )
 {
-	Serial << "power gl" << on << endl;
 	if	( on == srcp::ON )
 	{
 		// TODO warum funktioniert On/Off via Pin nicht?
