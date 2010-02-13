@@ -52,6 +52,7 @@ private:
 public:
 	GLAnalog293( int addr, uint8_t pin, uint8_t back, uint8_t ahead, SRCPGenericLoco* next  );
 	int set( int addr, int drivemode, int v, int v_max, int fn[] );
+	void setPower( int on );
 };
 
 }

@@ -29,6 +29,7 @@
 
 #include "WProgram.h"
 #include "GLAFMotor.h"
+#include "../srcp/SRCPSession.h"
 
 namespace dev
 {
@@ -62,7 +63,12 @@ int GLAFMotor::set( int addr, int drivemode, int v, int v_max, int fn[] )
 	v = map(v, 0, v_max, 0, 255);
 	motor->setSpeed( v );
 	return	( 200 );
+}
 
+void GLAFMotor::setPower( int on )
+{
+	if	( on == srcp::OFF )
+		motor->setSpeed( 0 );
 }
 
 }

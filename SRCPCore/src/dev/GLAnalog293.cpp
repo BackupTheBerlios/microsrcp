@@ -28,6 +28,7 @@
  */
 
 #include "GLAnalog293.h"
+#include "../srcp/SRCPSession.h"
 
 namespace dev
 {
@@ -71,6 +72,12 @@ int GLAnalog293::set(int addr, int drivemode, int v, int v_max, int fn[])
 	v = map(v, 0, v_max, 0, 255);
 	analogWrite( pin, v );
 	return	( 200 );
+}
+
+void GLAnalog293::setPower( int on )
+{
+	if	( on == srcp::OFF )
+		analogWrite( pin, 0 );
 }
 
 }

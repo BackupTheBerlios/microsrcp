@@ -28,14 +28,11 @@
 
 #include "WProgram.h"
 #include "GLArduinoMotor.h"
+#include "../srcp/SRCPSession.h"
 
 namespace dev
 {
 
-#define MOTOR10_64KHZ _BV(CS10)   // no prescale?
-#define MOTOR11_64KHZ _BV(CS20)  // no prescale
-
-// TODO weiterer Parameter fuer Maxwert Timer vorsehen.
 GLArduinoMotor::GLArduinoMotor( int addr, uint8_t pin, uint8_t dir, SRCPGenericLoco* next )
 {
 	this->addr = addr;
@@ -68,6 +65,12 @@ int GLArduinoMotor::set( int addr, int drivemode, int v, int v_max, int fn[] )
 	analogWrite( pin, v );
 
 	return (200);
+}
+
+void GLArduinoMotor::setPower( int on )
+{
+	if	( on == srcp::OFF )
+		analogWrite( pin, 0 );
 }
 
 /**

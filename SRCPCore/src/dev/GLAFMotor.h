@@ -43,6 +43,7 @@ private:
 public:
 	GLAFMotor( int addr, uint8_t no, srcp::SRCPGenericLoco* next );
 	int set( int addr, int drivemode, int v, int v_max, int fn[] );
+	void setPower( int on );
 };
 
 }
