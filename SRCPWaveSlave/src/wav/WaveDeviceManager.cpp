@@ -47,29 +47,39 @@ WaveDeviceManager::WaveDeviceManager()
 
 	if ( !card.init_card() )
 	{
+#if	( DEBUG_SCOPE > 0 )
 		Serial.println( "Card init. failed!" );
+#endif
 		return;
 	}
 	if ( !card.open_partition() )
 	{
+#if	( DEBUG_SCOPE > 0 )
 		Serial.println( "No partition!" );
+#endif
 		return;
 	}
 	if ( !card.open_filesys() )
 	{
+#if	( DEBUG_SCOPE > 0 )
 		Serial.println( "Couldn't open filesys" );
+#endif
 		return;
 	}
 
 	if ( !card.open_rootdir() )
 	{
+#if	( DEBUG_SCOPE > 0 )
 		Serial.println( "Couldn't open dir" );
+#endif
 		return;
 	}
 
+#if	( DEBUG_SCOPE > 0 )
 	Serial << "init card i.o" << endl;
 
 	ls();
+#endif
 
 }
 
@@ -94,6 +104,7 @@ srcp::SRCPGenericAccessoire* WaveDeviceManager::createGA( srcp::device_config_t 
 
 void WaveDeviceManager::ls()
 {
+#if	( DEBUG_SCOPE > 0 )
 	char name[13];
 	int ret;
 
@@ -109,6 +120,7 @@ void WaveDeviceManager::ls()
 		}
 		Serial.println( name );
 	}
+#endif
 }
 
 void WaveDeviceManager::playfile( char *name )
@@ -116,12 +128,16 @@ void WaveDeviceManager::playfile( char *name )
 	sound = card.open_file( name );
 	if ( !sound )
 	{
+#if	( DEBUG_SCOPE > 0 )
 		Serial.println( " Couldn't open file" );
+#endif
 		return;
 	}
 	if ( !wave.create( sound ) )
 	{
+#if	( DEBUG_SCOPE > 0 )
 		Serial.println( " Not a valid WAV" );
+#endif
 		return;
 	}
 	// ok time to play!

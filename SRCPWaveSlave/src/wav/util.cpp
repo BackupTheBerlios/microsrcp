@@ -5,8 +5,10 @@
 #include "WProgram.h"
 #include "util.h"
 
-void ROM_putstring(const char *str, uint8_t nl) {
-    uint8_t i;
+void ROM_putstring(const char *str, uint8_t nl)
+{
+#if	( DEBUG_SCOPE > 0 )
+	uint8_t i;
     
     for (i=0; pgm_read_byte(&str[i]); i++) {
       Serial.print(pgm_read_byte(&str[i]));
@@ -14,5 +16,6 @@ void ROM_putstring(const char *str, uint8_t nl) {
   if (nl) {
     Serial.print('\n'); Serial.print('\r');
   }
+#endif
 }
 

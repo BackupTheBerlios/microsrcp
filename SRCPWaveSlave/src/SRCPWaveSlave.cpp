@@ -47,12 +47,16 @@ srcp::device_config_t deviceConfig[] =
 
 void setup()
 {
+#if	( DEBUG_SCOPE > 0 )
 	Serial.begin( 19200 ); // set up Serial library at 9600 bps
+#endif
 
 	WireServer.addDeviceManager( new wav::WaveDeviceManager() );
 	WireServer.begin( deviceConfig, srcp::BOARD_WAVE, VERSION );
 
+#if	( DEBUG_SCOPE > 0 )
 	Serial << "Wave listen " <<  WireServer.getMyAddr() << endl;
+#endif
 }
 
 void loop()

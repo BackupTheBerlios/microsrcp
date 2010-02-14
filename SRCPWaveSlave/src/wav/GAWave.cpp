@@ -38,7 +38,9 @@ GAWave::GAWave( int addr, char* file, srcp::SRCPGenericAccessoire* next)
 
 int GAWave::set( int addr, int port, int value, int delay )
 {
-	//Serial << "play " << file << endl;
+#if	( DEBUG_SCOPE > 0 )
+	Serial << "play " << file << endl;
+#endif
 
 	// nur Namen setzen, noch nicht abspielen, weil in Interrupt-Routine!
 	WaveDeviceManager::setSound( file );

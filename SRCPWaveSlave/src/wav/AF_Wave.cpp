@@ -98,7 +98,9 @@ struct fat16_file_struct* open_file_in_dir(struct fat16_fs_struct* fs, struct fa
     struct fat16_dir_entry_struct file_entry;
     if(!find_file_in_dir(fs, dd, name, &file_entry)) {
 
-      //Serial.println("File not found");
+#if	( DEBUG_SCOPE > 0 )
+      Serial.println("File not found");
+#endif
 
         return 0;
     }
