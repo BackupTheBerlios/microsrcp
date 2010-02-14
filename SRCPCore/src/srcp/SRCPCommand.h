@@ -68,7 +68,7 @@ namespace srcp
 		int start_addr;
 		int end_addr;
 		devices device;
-		int subDevice; // Wert aus GADevices oder GLDevices
+		uint8_t subDevice; // Wert aus GADevices oder GLDevices
 		uint8_t args[4];
 	} ;
 

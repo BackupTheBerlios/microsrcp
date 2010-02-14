@@ -34,8 +34,14 @@ void dev::EStorage::init(srcp::device_config_t deviceConfig[], int id, int versi
 	// Board oder Version-Nr. gewechselt = Storage frisch initialisieren
 	if	( read(CV_BOARD) != id || read(CV_VERSION) != version || read(CV_PRODUCER) == CV_PRODUCER )
 	{
-		for ( int i = 0; deviceConfig[i].start_addr != -1; i++ )
+		int i = 0;
+		for ( ; deviceConfig[i].start_addr != -1; i++ )
 			writeConfig( i+1, deviceConfig[i] );
+
+		// EOF explizit schreiben!
+		int cv = (i + 1) * (sizeof(srcp::device_config_t) + 2);
+		for	( unsigned int ii = 0; ii < (sizeof(srcp::device_config_t) + 2); ii++ )
+			write( cv+ii, 255 );
 
 		// am Schluss allgemeine Werte zuruecksetzen um Fehler durch Reset zu verhindern
 		write( CV_ID, id );
@@ -60,7 +66,8 @@ srcp::device_config_t dev::EStorage::getConfig(int addr)
 	for	( unsigned int i = 0; i < sizeof(device.args); i++ )
 		device.args[i] = read( cv + i );
 
-/*	Serial << "config: dev: " << device.device << ":" << device.subDevice << ", addr " << device.start_addr << " - " << device.end_addr << ", args: ";
+/*	Serial << "config: addr: " << addr * (sizeof(srcp::device_config_t) + 2) << ", dev: " << device.device << ":"
+		   << (int) device.subDevice << ", addr " << device.start_addr << " - " << device.end_addr << ", args: ";
 	for	( unsigned int i = 0; i < sizeof(device.args); i++ )
 		Serial << (int) device.args[i] << " ";
 	Serial << endl;*/

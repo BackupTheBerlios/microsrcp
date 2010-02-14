@@ -25,29 +25,32 @@
 	! CV ! Name			! Beschreibung						! Bereich ! Wert !
 	! 1	 ! I2C Adresse	! Adresse im I2C Bus				! 0 - 127 !    3 !
 	! 2	 ! Board-Id		! Identifiziert das Board 1)	    ! 0 - 2	  !    0 !
-	!	 !				! 0 = Zentrale						!		  !		 !
-	!	 !				! 1 = GA Board						!		  !		 !
-	!	 !				! 2 = Wave Board					!		  !		 !
-	!	 !				! 3 = GL Analog Board				!		  !		 !
-	!	 !				! 4 = GL DCC Board					!		  !		 !
+	!	 !				!   0 = Zentrale					!		  !		 !
+	!	 !				!   3 = GA Board					!		  !		 !
+	!	 !				!  90 = Wave Board					!		  !		 !
+	!	 !				!  99 = GL DCC Board				!		  !		 !
+	!	 !				! 100 = GL Analog Board				!		  !		 !
 	! 7	 ! Versionsnr.	! Versionsnummer 1)					!		  !		 !
 	! 8	 ! Hersteller	! Hersteller-Kennung 2)				!		  !		 !
 	--------------------------------------------------------------------------
-	! 13 ! Geraettyp	! FB = 1 , GA = 2, GL = 3			!		  !		 !
-	! 14 ! Geraet		! siehe unten						!		  !		 !
-	! 15 !				! von Adresse 3)					!		  !		 !
-	! 16 !				!									!		  !		 !
-	! 18 !				! bis Adresse, 0 wenn nur 1 Geraet	!		  !		 !
-	! 16 !				! 3)								!		  !		 !
-	! 19 !          	! Optionaler Parameter, siehe Geraet!		  !		 !
-	! 20 !       		! "									!		  !		 !
-	! 21 !          	! "									!		  !		 !
-	! 22 !       		! "									!		  !		 !
-	! 23 !          	! Reserve, speichert z.B. den 		!		  !		 !
-	! 24 !       		! Zustand eines Geraetes			!		  !		 !
+	! 12 ! Geraettyp	! FB = 1 , GA = 2, GL = 3			!		  !		 !
+	! 13 ! Geraet		! siehe unten						!		  !		 !
+	! 14 !				! von Adresse 3)					!		  !		 !
+	! 15 !				!									!		  !		 !
+	! 16 !				! bis Adresse, 0 wenn nur 1 Geraet	!		  !		 !
+	! 17 !				! 3)								!		  !		 !
+	! 18 !          	! Optionaler Parameter, siehe Geraet!		  !		 !
+	! 19 !       		! "									!		  !		 !
+	! 20 !          	! "									!		  !		 !
+	! 21 !       		! "									!		  !		 !
+	! 22 !          	! Reserve, speichert z.B. den 		!		  !		 !
+	! 23 !       		! Zustand eines Geraetes			!		  !		 !
 	--------------------------------------------------------------------------
-	! 25 ! von     		! Parameter naechstes Geraet		!		  !		 !
+	! 24 ! von     		! Parameter naechstes Geraet		!		  !		 !
 	! 35 ! bis    		!                         			!		  !		 !
+	--------------------------------------------------------------------------
+	! 36 ! von     		! etc.								!		  !		 !
+	! 47 ! bis    		!                         			!		  !		 !
 	--------------------------------------------------------------------------
 
     1) Stimmt Board-Id oder Versionsnummer nicht mit dem EEPROM ueberein, wird
