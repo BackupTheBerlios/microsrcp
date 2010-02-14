@@ -24,14 +24,14 @@
 	--------------------------------------------------------------------------
 	! CV ! Name			! Beschreibung						! Bereich ! Wert !
 	! 1	 ! I2C Adresse	! Adresse im I2C Bus				! 0 - 127 !    3 !
-	! 2	 ! Board-Id		! Identifiziert das Board 1)	    ! 0 - 2	  !    0 !
+	! 2	 ! Board-Id		! Identifiziert das Board 1)	    ! 0 - 127 !    0 !
 	!	 !				!   0 = Zentrale					!		  !		 !
 	!	 !				!   3 = GA Board					!		  !		 !
 	!	 !				!  90 = Wave Board					!		  !		 !
 	!	 !				!  99 = GL DCC Board				!		  !		 !
 	!	 !				! 100 = GL Analog Board				!		  !		 !
 	! 7	 ! Versionsnr.	! Versionsnummer 1)					!		  !		 !
-	! 8	 ! Hersteller	! Hersteller-Kennung 2)				!		  !		 !
+	! 8	 ! Hersteller	! Hersteller-Kennung 2)				!		  !  123 !
 	--------------------------------------------------------------------------
 	! 12 ! Geraettyp	! FB = 1 , GA = 2, GL = 3			!		  !		 !
 	! 13 ! Geraet		! siehe unten						!		  !		 !
