@@ -60,7 +60,7 @@ srcp::device_config_t deviceConfig[] =
 
 		////////////////////// Board 100 - Motorentreiber //////////////////////////////////////////
 		// Loks mit der SRCP Adresse 3 und 4 werden an I2C Board 100 weitergeleitet
-		//{ 3, 4, srcp::GL, srcp::I2CGLMaster, { 100 } },
+		{ 3, 4, srcp::GL, srcp::I2CGLMaster, { 100 } },
 
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
