@@ -25,10 +25,12 @@
 extern "C" {
 #include "types.h"
 #include "twi.h"
+#include <string.h>
 }
 
 #include <wiring.h>
 #include "I2CUtil.h"
+#include "../srcp/SRCPCommand.h"
 
 namespace i2c
 {
@@ -68,6 +70,47 @@ int I2CUtil::read( int addr, uint8_t *buf, int size )
 	}
 	// timeout!
 	return (417);
+}
+
+int I2CUtil::setSM( int remoteAddr, int bus, int addr, int cv, int value )
+{
+	uint8_t buf[7];
+	buf[0] = srcp::SM;
+	buf[1] = srcp::SET;
+	int a = 0;
+	// nicht Board Eeprom aendern?
+	if	( bus != 0 )
+		a = addr;
+	memcpy( &buf[2], &a, 2 );
+	buf[4] = bus;
+	buf[5] = cv;
+	buf[6] = value;
+
+	return	( I2CUtil::write( remoteAddr, buf, sizeof(buf) ) );
+}
+
+int I2CUtil::getSM( int remoteAddr, int bus, int addr, int cv )
+{
+	uint8_t buf[6];
+	buf[0] = srcp::SM;
+	buf[1] = srcp::GET;
+	int a = 0;
+	// nicht Board Eeprom aendern?
+	if	( bus != 0 )
+		a = addr;
+	memcpy( &buf[2], &a, 2 );
+	buf[4] = bus;
+	buf[5] = cv;
+
+	int rc = I2CUtil::write( remoteAddr, buf, sizeof(buf) );
+	if	( rc != 200 )
+		return	( -1 );
+
+	rc = I2CUtil::read( remoteAddr, buf, 1 );
+	if	( rc != 200 )
+		return	( -1 );
+
+	return	( buf[0] );
 }
 
 }

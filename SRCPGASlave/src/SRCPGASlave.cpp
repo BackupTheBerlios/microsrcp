@@ -25,11 +25,11 @@
 
 #include "WProgram.h"
 
+#include "srcp/SRCPDeviceMaster.h"
 #include "dev/CoreDeviceManager.h"
 #include "i2c/I2CServer.h"
 
-// Meine I2C Adresse, muss fuer weitere Boards angepasst werden.
-#define MY_ADDR	1
+#define VERSION 10	// Version 1.0
 
 // Definition der lokalen Geraete - 1. Version, als Arduino Shield aufgebaut.
 srcp::device_config_t deviceConfig[] =
@@ -75,7 +75,9 @@ void setup()
 	//Serial.begin(19200);
 
 	WireServer.addDeviceManager( new dev::CoreDeviceManager() );
-	WireServer.begin( MY_ADDR, deviceConfig );
+	WireServer.begin( deviceConfig, srcp::BOARD_GA, VERSION );
+
+	//Serial << "GA listen " <<  WireServer.getMyAddr() << endl;
 }
 
 void loop()

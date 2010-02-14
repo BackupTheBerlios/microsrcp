@@ -69,16 +69,16 @@ I2CServer::I2CServer()
 	manager = new srcp::SRCPDeviceMaster();
 }
 
-void I2CServer::begin( int myAddr, srcp::device_config_t deviceConfig[] )
+void I2CServer::begin( srcp::device_config_t deviceConfig[], int id, int version )
 {
+	// initialize devices und EEPROM, muss als erstes erledigt werden
+	manager->init( deviceConfig, id, version );
+
 	// initialize the wire device and register event
 	twi_init();
-	twi_setAddress( myAddr );
 	twi_attachSlaveRxEvent( I2CServer::slaveRxEvent );
 	twi_attachSlaveTxEvent( I2CServer::slaveTxEvent );
-
-	// initialize devices
-	manager->init( deviceConfig );
+	twi_setAddress( manager->getMyAddr() );
 }
 
 void I2CServer::dispatch(uint8_t* args, int size )

@@ -19,6 +19,67 @@
 
 	Beispiel siehe SRCPGASlave, SRCPGLSlave, SRCPServer.
 
+	--------------------------------------------------------------------------
+	EEPROM Aufbau
+	--------------------------------------------------------------------------
+	! CV ! Name			! Beschreibung						! Bereich ! Wert !
+	! 1	 ! I2C Adresse	! Adresse im I2C Bus				! 0 - 127 !    3 !
+	! 2	 ! Board-Id		! Identifiziert das Board 1)	    ! 0 - 2	  !    0 !
+	!	 !				! 0 = Zentrale						!		  !		 !
+	!	 !				! 1 = GA Board						!		  !		 !
+	!	 !				! 2 = Wave Board					!		  !		 !
+	!	 !				! 3 = GL Analog Board				!		  !		 !
+	!	 !				! 4 = GL DCC Board					!		  !		 !
+	! 7	 ! Versionsnr.	! Versionsnummer 1)					!		  !		 !
+	! 8	 ! Hersteller	! Hersteller-Kennung 2)				!		  !		 !
+	--------------------------------------------------------------------------
+	! 13 ! Geraettyp	! FB = 1 , GA = 2, GL = 3			!		  !		 !
+	! 14 ! Geraet		! siehe unten						!		  !		 !
+	! 15 !				! von Adresse 3)					!		  !		 !
+	! 16 !				!									!		  !		 !
+	! 18 !				! bis Adresse, 0 wenn nur 1 Geraet	!		  !		 !
+	! 16 !				! 3)								!		  !		 !
+	! 19 !          	! Optionaler Parameter, siehe Geraet!		  !		 !
+	! 20 !       		! "									!		  !		 !
+	! 21 !          	! "									!		  !		 !
+	! 22 !       		! "									!		  !		 !
+	! 23 !          	! Reserve, speichert z.B. den 		!		  !		 !
+	! 24 !       		! Zustand eines Geraetes			!		  !		 !
+	--------------------------------------------------------------------------
+	! 25 ! von     		! Parameter naechstes Geraet		!		  !		 !
+	! 35 ! bis    		!                         			!		  !		 !
+	--------------------------------------------------------------------------
+
+    1) Stimmt Board-Id oder Versionsnummer nicht mit dem EEPROM ueberein, wird
+       dieses auf die Defaultwerte zurueckgesetzt. Damit wird verhindert, dass
+       beim Neuprogrammieren des Boardes falsche Werte im EEPROM stehen.
+    2) Wird die Hersteller-Kennung auf 8 gesetzt werden die EEPROM-Werte
+       beim naechsten Einschalten oder Reset zurueckgesetzt (Standard DCC).
+    3) Adresse besteht aus hoeherwertigen Byte (v/256) und niederwertigem
+       Byte (v%256).
+
+	FB - Feedback: Sensoren, Rueckmelder
+	--------------------------
+	0 = Sensor an externen I2C Board
+	1 = reserviert
+	2 = einfacher Sensor, z.B. Schutzgasrohrkontakt
+
+	GA - Generic Accessoire: Servo, Signal etc.
+	-------------------------------------------
+	0 = Adressen sind einem externen I2C Board zugeordnet
+	1 = DCC Board (Booster)
+	2 = Signal
+	3 = Servo
+	4 = Wave Shield
+
+	GL - Generic Loco: Lokomotive, Motorentreiber
+	---------------------------------------------
+	0 = Adressen sind einem externen I2C Board zugeordnet
+	1 = DCC Board (Booster)
+	2 = Motor an PWM Pin, z.B. gesteuert via Transistor
+	3 = AF_Motor Shield
+	4 = Arduino Motor Shield zur Steuerung analoger Lokomotiven
+
 	Copyright (c) 2010 Marcel Bernet.  All right reserved.
 
 	This program is free software; you can redistribute it and/or
@@ -37,26 +98,35 @@
  */
 
 #include "SRCPDeviceMaster.h"
-#include <EEPROM.h>
+#include "../dev/EStorage.h"
+#include "../i2c/I2CUtil.h"
 
 namespace srcp
 {
 
-void SRCPDeviceMaster::init( device_config_t deviceConfig[] )
+void SRCPDeviceMaster::init( device_config_t deviceConfig[], int id, int version )
 {
 	firstGA = 0;
 	firstGL = 0;
 	firstFB = 0;
 	SRCPDeviceManager* manager;
 
-	for ( int i = 0; deviceConfig[i].start_addr != -1; i++ )
+	// Persistenter Speicher (EEPROM) initialisieren, damit richtige Werte vorhanden sind.
+	Storage.init( deviceConfig, id, version );
+
+	for ( int i = 1; ; i++ )
 	{
-		switch ( deviceConfig[i].device )
+		device_config_t device = Storage.getConfig( i );
+		// EOF
+		if	( device.start_addr == -1 )
+			break;
+
+		switch ( device.device )
 		{
 			case GA:
 				for	( manager = firstManager; manager != 0; manager = manager->getNextManager() )
 				{
-					SRCPGenericAccessoire* nga = manager->createGA( deviceConfig[i], firstGA );
+					SRCPGenericAccessoire* nga = manager->createGA( device, firstGA );
 					if	( nga != 0 )
 					{
 						firstGA = nga;
@@ -67,7 +137,7 @@ void SRCPDeviceMaster::init( device_config_t deviceConfig[] )
 			case GL:
 				for	( manager = firstManager; manager != 0; manager = manager->getNextManager() )
 				{
-					SRCPGenericLoco* ngl = manager->createGL( deviceConfig[i], firstGL );
+					SRCPGenericLoco* ngl = manager->createGL( device, firstGL );
 					if ( ngl != 0 )
 					{
 						firstGL = ngl;
@@ -78,7 +148,7 @@ void SRCPDeviceMaster::init( device_config_t deviceConfig[] )
 			case FB:
 				for	( manager = firstManager; manager != 0; manager = manager->getNextManager() )
 				{
-					SRCPFeedback* nfb = manager->createFB( deviceConfig[i], firstFB );
+					SRCPFeedback* nfb = manager->createFB( device, firstFB );
 					if ( nfb != 0 )
 					{
 						firstFB = nfb;
@@ -149,10 +219,19 @@ int SRCPDeviceMaster::setSM( int bus, int addr, int cv, int value )
 	// Zentrale?
 	if	( addr == 0 && bus == 0 )
 	{
-		EEPROM.write( cv, value );
+		Storage.write( cv, value );
 		return	( 200 );
 	}
 
+	// CV's eines I2C Boardes setzen
+	if	( bus == 0 )
+	{
+		// TODO besser waere keine direktes Ansprechen des I2C Buses
+		i2c::I2CUtil::setSM( addr, bus, 0, cv, value );
+		return	( 200 );
+	}
+
+	// SM Parameter lokaler Boards setzen
 	for	( SRCPGenericAccessoire* n = firstGAElement(); n != 0; n = n->nextElement() )
 		n->setSM( bus, addr, cv, value );
 
@@ -166,7 +245,12 @@ int SRCPDeviceMaster::getSM( int bus, int addr, int cv )
 {
 	// Zentrale?
 	if	( addr == 0 && bus == 0 )
-		return	( EEPROM.read( cv ) );
+		return	( Storage.read( cv ) );
+
+	// CV's eines I2C Boardes lesen
+	if	( bus == 0 )
+		// besser waere keine direktes Ansprechen des I2C Buses
+		return	( i2c::I2CUtil::getSM( addr, bus, 0, cv ) );
 
 	int rc = -1;
 	for	( SRCPGenericAccessoire* n = firstGAElement(); n != 0; n = n->nextElement() )

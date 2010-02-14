@@ -36,6 +36,8 @@ public:
 	static void begin( int addr );
 	static int write( int addr, uint8_t *buf, int size );
 	static int read( int addr, uint8_t *buf, int size );
+	static int setSM( int remoteAddr, int bus, int addr, int cv, int value );
+	static int getSM( int remoteAddr, int bus, int addr, int cv );
 };
 
 }

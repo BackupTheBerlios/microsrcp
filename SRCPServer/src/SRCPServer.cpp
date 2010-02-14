@@ -28,6 +28,7 @@
 #include "WProgram.h"
 #include "lan/EthernetSRCPServer.h"
 
+#include "srcp/SRCPDeviceMaster.h"
 #include "dev/CoreDeviceManager.h"
 #include "i2c/I2CDeviceManager.h"
 #include "i2c/I2CUtil.h"
@@ -36,16 +37,30 @@
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 241 };
 
+#define VERSION 10	// Version 1.0
+
 // Definition der I2C Boards - muss fuer weitere Boards erweitert werden.
 srcp::device_config_t deviceConfig[] =
 	{
 		////////////////////// Board 1 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
-		// Die SRCP Adressen 32 - 63 werden an I2C Board 1 weitergeleitet
-		{ 32, 63, srcp::GA, srcp::I2CGAMaster, { 1 } },
-		// Die SRCP Adressen 64 - 96 werden an I2C Board 1 weitergeleitet
-		{ 64, 96, srcp::GA, srcp::I2CGAMaster, { 1 } },
-		// Die SRCP Rueckmelder 1 - 8 befinden sich auf I2C Board 1
+		// 6 Servo und 2 Lichtsignale
+		{ 1, 8, srcp::GA, srcp::I2CGAMaster, { 1 } },
+		// 8 Rueckmelder
 		{ 1, 8, srcp::FB, srcp::I2CFBMaster, { 1 } },
+
+		////////////////////// Board 2 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
+		// 6 Servo und 2 Lichtsignale
+		{ 9, 16, srcp::GA, srcp::I2CGAMaster, { 2 } },
+		// 8 Rueckmelder
+		{ 9, 16, srcp::FB, srcp::I2CFBMaster, { 2 } },
+
+		////////////////////// Board 3 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
+		// 6 Servo und 2 Lichtsignale
+		{ 17, 24, srcp::GA, srcp::I2CGAMaster, { 3 } },
+		// 8 Rueckmelder
+		{ 17, 24, srcp::FB, srcp::I2CFBMaster, { 3 } },
+
+		////////////////////// Board 4 - etc. /////////////
 
 		////////////////////// Board 90 - 92 - Abspielen von Wave Dateien /////////////
 		// Die SRCP Adressen 100 - 199 werden an I2C Board 90 weitergeleitet
@@ -71,12 +86,12 @@ void setup()
 
 	//EthernetServer.addDeviceManager( &CoreDevices );
 	EthernetServer.addDeviceManager( new i2c::I2CDeviceManager() );
-	EthernetServer.begin( mac, ip, 4303, deviceConfig );
+	EthernetServer.begin( mac, ip, 4303, deviceConfig, srcp::BOARD_CPU, VERSION );
 
 	// initialize I2C - Master braucht keine Adresse
 	i2c::I2CUtil::begin( 0 );
 
-	Serial << "setup i.o. " << endl;
+	Serial << "Server setup i.o. " << endl;
 }
 
 void loop()

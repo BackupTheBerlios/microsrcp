@@ -44,11 +44,11 @@ extern "C"
 
 #include "WProgram.h"
 
+#include "srcp/SRCPDeviceMaster.h"
 #include "dcc/DCCDeviceManager.h"
 #include "i2c/I2CServer.h"
 
-// Meine I2C Adresse, muss fuer weitere Boards angepasst werden.
-#define MY_ADDR	99
+#define VERSION 11	// Version 1.0
 
 // Definition der lokalen Geraete
 srcp::device_config_t deviceConfig[] =
@@ -68,10 +68,10 @@ t_opendcc_state opendcc_state; // this is the current running state
 
 void setup()
 {
-	Serial.begin(19200);
+	//Serial.begin(19200);
 
 	WireServer.addDeviceManager( new dcc::DCCDeviceManager() );
-	WireServer.begin( MY_ADDR, deviceConfig );
+	WireServer.begin( deviceConfig, srcp::BOARD_DCC, VERSION );
 
 	init_main();
 	init_dccout(); // timing engine for dcc
@@ -79,7 +79,7 @@ void setup()
 	init_organizer(); // engine for command repetition, memory of loco speeds and types
 	opendcc_state = RUN_OKAY;
 
-	Serial << "listen" << endl;
+	//Serial << "listen " <<  WireServer.getMyAddr() << endl;
 }
 
 void loop()

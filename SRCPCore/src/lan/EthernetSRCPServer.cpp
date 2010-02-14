@@ -54,7 +54,7 @@ EthernetSRCPServer::EthernetSRCPServer()
 	infoSRCPSession = new srcp::SRCPSession( devices );
 }
 
-void EthernetSRCPServer::begin( byte mac[], byte ip[], int port, srcp::device_config_t deviceConfig[] )
+void EthernetSRCPServer::begin( byte mac[], byte ip[], int port, srcp::device_config_t deviceConfig[], int id, int version )
 {
 	commandSocket = new ServerSocket( port );
 	infoSocket = new ServerSocket( port );
@@ -65,7 +65,7 @@ void EthernetSRCPServer::begin( byte mac[], byte ip[], int port, srcp::device_co
 	infoSocket->begin();
 
 	// initialize devices
-	devices->init( deviceConfig );
+	devices->init( deviceConfig, id, version );
 }
 
 void EthernetSRCPServer::run()

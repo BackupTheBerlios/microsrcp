@@ -41,9 +41,13 @@
 
 #include "SRCPCommand.h"
 #include "SRCPDeviceManager.h"
+#include "../dev/EStorage.h"
 
 namespace srcp
 {
+
+enum boards { BOARD_CPU = 0, BOARD_GA = 3, BOARD_WAVE = 90, BOARD_DCC = 99, BOARD_GL = 100 };
+
 template<class T>
 class Enumeration
 {
@@ -86,7 +90,7 @@ public:
 	SRCPGenericLoco* firstGLElement() { return( firstGL ); }
 	SRCPFeedback* firstFeedbackElement() { return( firstFB ); }
 	void addDeviceManager( SRCPDeviceManager *manager ) { manager->setNextManager( firstManager ); firstManager = manager; }
-	void init( device_config_t deviceConfig[] );
+	void init( device_config_t deviceConfig[], int id, int version );
 	int setGA( int addr, int port, int value, int delay );
 	int setGL( int addr, int drivemode, int v, int v_max, int fn[] );
 	void refresh();
@@ -94,6 +98,7 @@ public:
 	void setPower( int on );
 	int setSM( int bus, int addr, int cv, int value );
 	int getSM( int bus, int addr, int cv );
+	int getMyAddr() { return ( Storage.read( CV_ID ) ); }
 };
 
 }
