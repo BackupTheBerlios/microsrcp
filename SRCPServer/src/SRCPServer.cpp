@@ -44,50 +44,17 @@ srcp::device_config_t deviceConfig[] =
 	{
 		////////////////////// Board 1 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
 		// 6 Servo und 2 Lichtsignale
-		{ 1, 8, srcp::GA, srcp::I2CGAMaster, { 1 } },
+		{ 1, 8, srcp::GA_ARRAY, srcp::I2CGAMaster, { 10, 1 } },
 		// 8 Rueckmelder
-		{ 1, 8, srcp::FB, srcp::I2CFBMaster, { 1 } },
+		{ 1, 8, srcp::FB_ARRAY, srcp::I2CFBMaster, { 10, 1 } },
 
-		////////////////////// Board 2 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
-		// 6 Servo und 2 Lichtsignale
-		{ 9, 16, srcp::GA, srcp::I2CGAMaster, { 2 } },
-		// 8 Rueckmelder
-		{ 9, 16, srcp::FB, srcp::I2CFBMaster, { 2 } },
-
-		////////////////////// Board 3 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
-		// 6 Servo und 2 Lichtsignale
-		{ 17, 24, srcp::GA, srcp::I2CGAMaster, { 3 } },
-		// 8 Rueckmelder
-		{ 17, 24, srcp::FB, srcp::I2CFBMaster, { 3 } },
-
-		////////////////////// Board 4 - etc. /////////////
-#if	( DEBUG_SCOPE == 0 ) // Serial braucht viel Speicher, ansonsten Memoryoverflow!
-		{ 25, 32, srcp::GA, srcp::I2CGAMaster, { 4 } },
-		{ 25, 32, srcp::FB, srcp::I2CFBMaster, { 4 } },
-		{ 33, 40, srcp::GA, srcp::I2CGAMaster, { 5 } },
-		{ 33, 40, srcp::FB, srcp::I2CFBMaster, { 5 } },
-		{ 41, 48, srcp::GA, srcp::I2CGAMaster, { 6 } },
-		{ 41, 48, srcp::FB, srcp::I2CFBMaster, { 6 } },
-		{ 49, 56, srcp::GA, srcp::I2CGAMaster, { 7 } },
-		{ 49, 56, srcp::FB, srcp::I2CFBMaster, { 7 } },
-		{ 57, 64, srcp::GA, srcp::I2CGAMaster, { 8 } },
-		{ 57, 64, srcp::FB, srcp::I2CFBMaster, { 8 } },
-		{ 65, 72, srcp::GA, srcp::I2CGAMaster, { 9 } },
-		{ 65, 72, srcp::FB, srcp::I2CFBMaster, { 9 } },
-		{ 73, 80, srcp::GA, srcp::I2CGAMaster, { 10 } },
-		{ 73, 80, srcp::FB, srcp::I2CFBMaster, { 10 } },
-#endif
 		////////////////////// Board 90 - 92 - Abspielen von Wave Dateien /////////////
 		// Die SRCP Adressen 100 - 199 werden an I2C Board 90 weitergeleitet
-		{ 100, 199, srcp::GA, srcp::I2CGAMaster, { 90 } },
-#if	( DEBUG_SCOPE == 0 )
-		{ 200, 299, srcp::GA, srcp::I2CGAMaster, { 91 } },
-		{ 300, 399, srcp::GA, srcp::I2CGAMaster, { 92 } },
-#endif
+		{ 100, 199, srcp::GA_ARRAY, srcp::I2CGAMaster, { 3, 90 } },
 
 		////////////////////// Board 99 - OpenDCC //////////////////////////////////////////////////
 		// Loks mit der SRCP Adresse 10 bis 9999 werden an I2C Board 99 weitergeleitet
-		{ 10, 9999, srcp::GL, srcp::I2CGLMaster, { 99 } },
+		{ 10, 9999, srcp::GL_ARRAY, srcp::I2CGLMaster, { 5, 95 } },
 		// Zubehoer mit der SRCP Adresse 1 und 999 werden an I2C Board 99 weitergeleitet
 		{  1,  999, srcp::GA, srcp::I2CGAMaster, { 99 } },
 
