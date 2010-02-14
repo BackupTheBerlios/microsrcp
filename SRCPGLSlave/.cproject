@@ -41,6 +41,9 @@
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/arduino8-0017/include}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/SRCPCore/src}&quot;"/>
 </option>
+<option id="de.innot.avreclipse.cppcompiler.option.def.2030242952" name="Define Syms (-D)" superClass="de.innot.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="DEBUG_SCOPE=0"/>
+</option>
 <inputType id="de.innot.avreclipse.cppcompiler.input.1786636728" superClass="de.innot.avreclipse.cppcompiler.input"/>
 </tool>
 <tool id="de.innot.avreclipse.tool.linker.winavr.app.release.504288127" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.release"/>

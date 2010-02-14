@@ -42,6 +42,9 @@
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/SRCPCore/src}&quot;"/>
 <listOptionValue builtIn="false" value="&quot;${workspace_loc:/OpenDCCCore/src}&quot;"/>
 </option>
+<option id="de.innot.avreclipse.cppcompiler.option.def.1311178375" name="Define Syms (-D)" superClass="de.innot.avreclipse.cppcompiler.option.def" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="DEBUG_SCOPE=0"/>
+</option>
 <inputType id="de.innot.avreclipse.cppcompiler.input.1003654634" superClass="de.innot.avreclipse.cppcompiler.input"/>
 </tool>
 <tool id="de.innot.avreclipse.tool.linker.winavr.app.release.1976134290" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.release"/>

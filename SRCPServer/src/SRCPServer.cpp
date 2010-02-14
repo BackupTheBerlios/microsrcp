@@ -37,7 +37,7 @@
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 241 };
 
-#define VERSION 10	// Version 1.0
+#define VERSION 11		// Version x.y
 
 // Definition der I2C Boards - muss fuer weitere Boards erweitert werden.
 srcp::device_config_t deviceConfig[] =
@@ -61,10 +61,29 @@ srcp::device_config_t deviceConfig[] =
 		{ 17, 24, srcp::FB, srcp::I2CFBMaster, { 3 } },
 
 		////////////////////// Board 4 - etc. /////////////
-
+#if	( DEBUG_SCOPE == 0 ) // Serial braucht viel Speicher, ansonsten Memoryoverflow!
+		{ 25, 32, srcp::GA, srcp::I2CGAMaster, { 4 } },
+		{ 25, 32, srcp::FB, srcp::I2CFBMaster, { 4 } },
+		{ 33, 40, srcp::GA, srcp::I2CGAMaster, { 5 } },
+		{ 33, 40, srcp::FB, srcp::I2CFBMaster, { 5 } },
+		{ 41, 48, srcp::GA, srcp::I2CGAMaster, { 6 } },
+		{ 41, 48, srcp::FB, srcp::I2CFBMaster, { 6 } },
+		{ 49, 56, srcp::GA, srcp::I2CGAMaster, { 7 } },
+		{ 49, 56, srcp::FB, srcp::I2CFBMaster, { 7 } },
+		{ 57, 64, srcp::GA, srcp::I2CGAMaster, { 8 } },
+		{ 57, 64, srcp::FB, srcp::I2CFBMaster, { 8 } },
+		{ 65, 72, srcp::GA, srcp::I2CGAMaster, { 9 } },
+		{ 65, 72, srcp::FB, srcp::I2CFBMaster, { 9 } },
+		{ 73, 80, srcp::GA, srcp::I2CGAMaster, { 10 } },
+		{ 73, 80, srcp::FB, srcp::I2CFBMaster, { 10 } },
+#endif
 		////////////////////// Board 90 - 92 - Abspielen von Wave Dateien /////////////
 		// Die SRCP Adressen 100 - 199 werden an I2C Board 90 weitergeleitet
 		{ 100, 199, srcp::GA, srcp::I2CGAMaster, { 90 } },
+#if	( DEBUG_SCOPE == 0 )
+		{ 200, 299, srcp::GA, srcp::I2CGAMaster, { 91 } },
+		{ 300, 399, srcp::GA, srcp::I2CGAMaster, { 92 } },
+#endif
 
 		////////////////////// Board 99 - OpenDCC //////////////////////////////////////////////////
 		// Loks mit der SRCP Adresse 10 bis 9999 werden an I2C Board 99 weitergeleitet
@@ -74,7 +93,7 @@ srcp::device_config_t deviceConfig[] =
 
 		////////////////////// Board 100 - Motorentreiber //////////////////////////////////////////
 		// Loks mit der SRCP Adresse 3 und 4 werden an I2C Board 100 weitergeleitet
-		{ 3, 4, srcp::GL, srcp::I2CGLMaster, { 100 } },
+		//{ 3, 4, srcp::GL, srcp::I2CGLMaster, { 100 } },
 
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
@@ -82,7 +101,9 @@ srcp::device_config_t deviceConfig[] =
 
 void setup()
 {
+#if	( DEBUG_SCOPE > 0 )
 	Serial.begin( 19200 );
+#endif
 
 	//EthernetServer.addDeviceManager( &CoreDevices );
 	EthernetServer.addDeviceManager( new i2c::I2CDeviceManager() );
@@ -91,7 +112,9 @@ void setup()
 	// initialize I2C - Master braucht keine Adresse
 	i2c::I2CUtil::begin( 0 );
 
+#if	( DEBUG_SCOPE > 0 )
 	Serial << "Server setup i.o. " << endl;
+#endif
 }
 
 void loop()

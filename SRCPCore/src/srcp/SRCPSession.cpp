@@ -117,7 +117,9 @@ void SRCPSession::infoFeedback( Print* out )
 		for	( int i = 0; fb[i].pin != 0; i++ )
 		{
 			char* m = Messages.info( 0, "FB", fb[i].pin, fb[i].value );
-			//Serial << "rc " << m << endl;
+#if	( DEBUG_SCOPE > 0 )
+			Serial << "send : " << getStatus() << ", " << m << '\r';
+#endif
 			out->println( m );
 		}
 	}

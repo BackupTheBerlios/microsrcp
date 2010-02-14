@@ -81,7 +81,9 @@ void EthernetSRCPServer::run( srcp::SRCPSession *server, lan::ServerSocket* sock
 		// noch nicht verbunden - zuerst Versioninfo senden
 		if	( server->getStatus() == srcp::UNDEFINED )
 		{
+#if	( DEBUG_SCOPE > 0 )
 			Serial << "conn : " << server->getStatus() << endl;
+#endif
 			socket->print( server->version() );
 		}
 
@@ -99,10 +101,14 @@ void EthernetSRCPServer::run( srcp::SRCPSession *server, lan::ServerSocket* sock
 				continue;
 			command[pos] = '\0';
 
-			Serial << "data :" << server->getStatus() << ", " << command << endl;
+#if	( DEBUG_SCOPE > 0 )
+			Serial << "data : " << server->getStatus() << ", " << command << endl;
+#endif
 			char* rc = server->dispatch( command );
 
-			Serial << "rc   :" << server->getStatus() << ", " << rc << '\r';
+#if	( DEBUG_SCOPE > 0 )
+			Serial << "rc   : " << server->getStatus() << ", " << rc << '\r';
+#endif
 			socket->print( rc );
 			pos = 0;
 			break;
@@ -125,7 +131,9 @@ void EthernetSRCPServer::run( srcp::SRCPSession *server, lan::ServerSocket* sock
 	{
 		if	( server->getStatus() != srcp::UNDEFINED )
 		{
+#if	( DEBUG_SCOPE > 0 )
 			Serial << "disconnect" << endl;
+#endif
 			server->disconnect();
 			socket->stop();
 			// auf ein neues!

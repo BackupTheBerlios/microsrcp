@@ -68,7 +68,9 @@ t_opendcc_state opendcc_state; // this is the current running state
 
 void setup()
 {
-	//Serial.begin(19200);
+#if	( DEBUG_SCOPE > 0 )
+	Serial.begin(19200);
+#endif
 
 	WireServer.addDeviceManager( new dcc::DCCDeviceManager() );
 	WireServer.begin( deviceConfig, srcp::BOARD_DCC, VERSION );
@@ -79,7 +81,9 @@ void setup()
 	init_organizer(); // engine for command repetition, memory of loco speeds and types
 	opendcc_state = RUN_OKAY;
 
-	//Serial << "listen " <<  WireServer.getMyAddr() << endl;
+#if	( DEBUG_SCOPE > 0 )
+	Serial << "listen " <<  WireServer.getMyAddr() << endl;
+#endif
 }
 
 void loop()

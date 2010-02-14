@@ -66,11 +66,13 @@ srcp::device_config_t dev::EStorage::getConfig(int addr)
 	for	( unsigned int i = 0; i < sizeof(device.args); i++ )
 		device.args[i] = read( cv + i );
 
-/*	Serial << "config: addr: " << addr * (sizeof(srcp::device_config_t) + 2) << ", dev: " << device.device << ":"
+#if	( DEBUG_SCOPE > 0 )
+	Serial << "config: addr: " << addr * (sizeof(srcp::device_config_t) + 2) << ", dev: " << device.device << ":"
 		   << (int) device.subDevice << ", addr " << device.start_addr << " - " << device.end_addr << ", args: ";
 	for	( unsigned int i = 0; i < sizeof(device.args); i++ )
 		Serial << (int) device.args[i] << " ";
-	Serial << endl;*/
+	Serial << endl;
+#endif
 
 	return	( device );
 }

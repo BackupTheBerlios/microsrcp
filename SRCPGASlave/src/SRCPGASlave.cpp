@@ -72,12 +72,16 @@ srcp::device_config_t deviceConfig[] =
 
 void setup()
 {
-	//Serial.begin(19200);
+#if	( DEBUG_SCOPE > 0 )
+	Serial.begin(19200);
+#endif
 
 	WireServer.addDeviceManager( new dev::CoreDeviceManager() );
 	WireServer.begin( deviceConfig, srcp::BOARD_GA, VERSION );
 
-	//Serial << "GA listen " <<  WireServer.getMyAddr() << endl;
+#if	( DEBUG_SCOPE > 0 )
+	Serial << "GA listen " <<  WireServer.getMyAddr() << endl;
+#endif
 }
 
 void loop()

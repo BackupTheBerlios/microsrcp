@@ -67,7 +67,9 @@ int GLOpenDCC::set( int addr, int drivemode, int v, int v_max, int fn[] )
 	if	( drivemode )
 		v |= 0x80;
 
-	//Serial << "setGL addr=" << addr << ", v=" << v << endl;
+#if	( DEBUG_SCOPE > 1 )
+	Serial << "setGL addr=" << addr << ", v=" << v << endl;
+#endif
 
 	int f = bitRead( fn[3], 0 );
 	do_loco_func_grp0( addr, f );	// Licht

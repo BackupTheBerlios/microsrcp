@@ -71,7 +71,9 @@ int FBSwitchSensor::info( int addr, srcp::feedback fb[] )
 		{
 			fb[pos].pin = i + this->addr;
 			fb[pos].value = bitRead(sensor, i);
-			//Serial << "sensor " << fb[pos].pin << ":" << fb[pos].value << endl;
+#if	( DEBUG_SCOPE > 1 )
+			Serial << "sensor " << fb[pos].pin << ":" << fb[pos].value << endl;
+#endif
 			pos++;
 		}
 
