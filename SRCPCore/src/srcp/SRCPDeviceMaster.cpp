@@ -58,6 +58,8 @@
        beim Neuprogrammieren des Boardes falsche Werte im EEPROM stehen.
     2) Wird die Hersteller-Kennung auf 8 gesetzt werden die EEPROM-Werte
        beim naechsten Einschalten oder Reset zurueckgesetzt (Standard DCC).
+       Ein Wert 255 fuehrt einen Software-Reset des Board durch, ohne die
+       gespeicherten Werte zu veraendern.
     3) Adresse besteht aus hoeherwertigen Byte (v/256) und niederwertigem
        Byte (v%256).
 
@@ -222,6 +224,10 @@ int SRCPDeviceMaster::setSM( int bus, int addr, int cv, int value )
 	// Zentrale?
 	if	( addr == 0 && bus == 0 )
 	{
+		// 8,255 = Reset Chip, Werte im EEPROM bleiben erhalten
+		if	( cv == CV_PRODUCER && value == 255 )
+			asm volatile ("jmp 0x0000");
+
 		Storage.write( cv, value );
 		return	( 200 );
 	}
