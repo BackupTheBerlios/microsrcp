@@ -56,7 +56,7 @@ public:
 	char* dispatch( char* args, int length = 0 );
 	const char* version();
 	int getStatus() { return (status); }
-	void disconnect() { power = OFF; status = UNDEFINED; };
+	void disconnect();
 	char* sendFeedback( char *buf );
 	int isPowerOn() { return( power == ON ); }
 	void infoFeedback( Print* out  );

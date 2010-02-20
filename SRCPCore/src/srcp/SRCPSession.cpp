@@ -130,6 +130,14 @@ void SRCPSession::refresh()
 	manager->refresh();
 }
 
+void SRCPSession::disconnect()
+{
+	power = OFF;
+	if	( status == COMMAND )
+		manager->setPower( power );
+	status = UNDEFINED;
+};
+
 void SRCPSession::parse( char* args, int length )
 {
 	char d[10];
