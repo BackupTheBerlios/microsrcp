@@ -6,6 +6,10 @@ Arduino IDE
 patch/WMemory.cpp in Verzeichnis hardware/cores/arduino der
 Arduino IDE kopieren.
 
+Optional: nur um Debugging einzuschalten, patch/Streaming.h
+wie oben kopieren und in WProgram.h hinter #include "HardwareSerial.h"
+die Zeile #include "Streaming.h einfuegen.
+
 Und patch/AF_Wave in hardware/libraries/AF_Wave kopieren
 nachdem die AF_Wave Library dorthin kopiert wurde!
 (umschliesst wave.h mit #ifdef #endif).
