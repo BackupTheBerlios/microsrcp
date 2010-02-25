@@ -219,10 +219,10 @@ void SRCPDeviceMaster::setPower( int on )
 		n->setPower( on );
 }
 
-int SRCPDeviceMaster::setSM( int bus, int addr, int cv, int value )
+int SRCPDeviceMaster::setSM( int bus, int addr, int device, int cv, int value )
 {
 	// Zentrale?
-	if	( addr == 0 && bus == 0 )
+	if	( device == CV && addr == 0 && bus == 0 )
 	{
 		// 8,255 = Reset Chip, Werte im EEPROM bleiben erhalten
 		if	( cv == CV_PRODUCER && value == 255 )
@@ -233,41 +233,41 @@ int SRCPDeviceMaster::setSM( int bus, int addr, int cv, int value )
 	}
 
 	// CV's eines I2C Boardes setzen
-	if	( bus == 0 )
+	if	( device == CV && bus == 0 )
 	{
 		// TODO besser waere keine direktes Ansprechen des I2C Buses
-		i2c::I2CUtil::setSM( addr, bus, 0, cv, value );
+		i2c::I2CUtil::setSM( addr, bus, 0, device, cv, value );
 		return	( 200 );
 	}
 
 	// SM Parameter lokaler Boards setzen
 	for	( SRCPGenericAccessoire* n = firstGAElement(); n != 0; n = n->nextElement() )
-		n->setSM( bus, addr, cv, value );
+		n->setSM( bus, addr, device, cv, value );
 
 	for	( SRCPGenericLoco* n = firstGLElement(); n != 0; n = n->nextElement() )
-		n->setSM( bus, addr, cv, value );
+		n->setSM( bus, addr, device, cv, value );
 
 	return	( 200 );
 }
 
-int SRCPDeviceMaster::getSM( int bus, int addr, int cv )
+int SRCPDeviceMaster::getSM( int bus, int addr, int device, int cv )
 {
 	// Zentrale?
-	if	( addr == 0 && bus == 0 )
+	if	( device == CV && addr == 0 && bus == 0 )
 		return	( Storage.read( cv ) );
 
 	// CV's eines I2C Boardes lesen
-	if	( bus == 0 )
+	if	( device == CV && bus == 0 )
 		// besser waere keine direktes Ansprechen des I2C Buses
-		return	( i2c::I2CUtil::getSM( addr, bus, 0, cv ) );
+		return	( i2c::I2CUtil::getSM( addr, bus, 0, device, cv ) );
 
 	int rc = -1;
 	for	( SRCPGenericAccessoire* n = firstGAElement(); n != 0; n = n->nextElement() )
-		if	( (rc = n->getSM( bus, addr, cv ) ) != -1 )
+		if	( (rc = n->getSM( bus, addr, device, cv ) ) != -1 )
 			return	( rc );
 
 	for	( SRCPGenericLoco* n = firstGLElement(); n != 0; n = n->nextElement() )
-		if	( (rc = n->getSM( bus, addr, cv ) ) != -1 )
+		if	( (rc = n->getSM( bus, addr, device, cv ) ) != -1 )
 			return	( rc );
 
 	return	( -1 );

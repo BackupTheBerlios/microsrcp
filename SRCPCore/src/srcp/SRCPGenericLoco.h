@@ -41,8 +41,8 @@ public:
 	virtual int get( int addr, int port ) { return ( 423 ); }
 	virtual int set( int addr, int drivemode, int v, int v_max, int fn[] ) { return ( 423 ); }
 	virtual void setPower( int on ) {}
-	virtual int setSM( int bus, int addr, int cv, int value ) { return( 200 ); }
-	virtual int getSM( int bus, int addr, int cv ) { return( -1 ); };
+	virtual int setSM( int bus, int addr, int device, int cv, int value ) { return( 200 ); }
+	virtual int getSM( int bus, int addr, int device, int cv ) { return( -1 ); };
 };
 }
 

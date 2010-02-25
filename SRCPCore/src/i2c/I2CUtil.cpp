@@ -72,9 +72,9 @@ int I2CUtil::read( int addr, uint8_t *buf, int size )
 	return (417);
 }
 
-int I2CUtil::setSM( int remoteAddr, int bus, int addr, int cv, int value )
+int I2CUtil::setSM( int remoteAddr, int bus, int addr, int device, int cv, int value )
 {
-	uint8_t buf[7];
+	uint8_t buf[8];
 	buf[0] = srcp::SM;
 	buf[1] = srcp::SET;
 	int a = 0;
@@ -83,15 +83,16 @@ int I2CUtil::setSM( int remoteAddr, int bus, int addr, int cv, int value )
 		a = addr;
 	memcpy( &buf[2], &a, 2 );
 	buf[4] = bus;
-	buf[5] = cv;
-	buf[6] = value;
+	buf[5] = device;
+	buf[6] = cv;
+	buf[7] = value;
 
 	return	( I2CUtil::write( remoteAddr, buf, sizeof(buf) ) );
 }
 
-int I2CUtil::getSM( int remoteAddr, int bus, int addr, int cv )
+int I2CUtil::getSM( int remoteAddr, int bus, int addr, int device, int cv )
 {
-	uint8_t buf[6];
+	uint8_t buf[7];
 	buf[0] = srcp::SM;
 	buf[1] = srcp::GET;
 	int a = 0;
@@ -100,7 +101,8 @@ int I2CUtil::getSM( int remoteAddr, int bus, int addr, int cv )
 		a = addr;
 	memcpy( &buf[2], &a, 2 );
 	buf[4] = bus;
-	buf[5] = cv;
+	buf[5] = device;
+	buf[6] = cv;
 
 	int rc = I2CUtil::write( remoteAddr, buf, sizeof(buf) );
 	if	( rc != 200 )

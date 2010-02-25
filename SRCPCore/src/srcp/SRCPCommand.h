@@ -44,7 +44,7 @@ namespace srcp
  */
 
 	enum commands { GET, SET, GO, CONNECTIONMODE, CHECK, WAIT, INIT, TERM, RESET, VERIFY, PROTOCOL, UNKNOWN };
-	enum devices { POWER, FB, GA, GL, SM, FB_ARRAY, GA_ARRAY, GL_ARRAY, NA };
+	enum devices { POWER, FB, GA, GL, SM, FB_ARRAY, GA_ARRAY, GL_ARRAY, CV, NA };
 
 	struct command_t
 	{

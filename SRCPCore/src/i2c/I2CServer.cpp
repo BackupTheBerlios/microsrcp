@@ -71,7 +71,7 @@ I2CServer::I2CServer()
 	manager = new srcp::SRCPDeviceMaster();
 }
 
-void I2CServer::begin( srcp::device_config_t deviceConfig[], int id, int version )
+void I2CServer::begin( srcp::device_config_t deviceConfig[], int id, int version, int addr )
 {
 	// initialize devices und EEPROM, muss als erstes erledigt werden
 	manager->init( deviceConfig, id, version );
@@ -80,7 +80,7 @@ void I2CServer::begin( srcp::device_config_t deviceConfig[], int id, int version
 	twi_init();
 	twi_attachSlaveRxEvent( I2CServer::slaveRxEvent );
 	twi_attachSlaveTxEvent( I2CServer::slaveTxEvent );
-	twi_setAddress( manager->getMyAddr() );
+	twi_setAddress( (addr != -1) ? addr : manager->getMyAddr() );
 }
 
 void I2CServer::dispatch(uint8_t* args, int size )
@@ -116,7 +116,7 @@ void I2CServer::dispatch(uint8_t* args, int size )
 					break;
 
 				case srcp::SM:
-					manager->setSM( cmd.values[0], cmd.addr, cmd.values[1], cmd.values[2] );
+					manager->setSM( cmd.values[0], cmd.addr, cmd.values[1], cmd.values[2], cmd.values[3] );
 					break;
 
 				default:
@@ -140,7 +140,7 @@ int I2CServer::dispatchTx()
 					return	( 1 );
 
 				case srcp::SM:
-					cmd.args[0] = manager->getSM( cmd.values[0], cmd.addr, cmd.values[1] );
+					cmd.args[0] = manager->getSM( cmd.values[0], cmd.addr, cmd.values[1], cmd.values[2] );
 					return ( 1 );
 				default:
 					break;

@@ -48,7 +48,7 @@ private:
 public:
 	I2CServer();
 	void addDeviceManager( srcp::SRCPDeviceManager* manager ) { this->manager->addDeviceManager( manager ); }
-	void begin( srcp::device_config_t deviceConfig[], int id, int version );
+	void begin( srcp::device_config_t deviceConfig[], int id, int version, int addr = -1 );
 	void run();
 	virtual ~I2CServer();
 	int getMyAddr() { return( this->manager->getMyAddr() ); }

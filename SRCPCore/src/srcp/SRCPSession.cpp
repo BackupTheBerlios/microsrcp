@@ -55,7 +55,7 @@ char* SRCPSession::dispatch(char* args, int length )
 			switch (cmd.device)
 			{
 				case SM:
-					int rc = manager->getSM( cmd.bus, cmd.addr, cmd.values[0] );
+					int rc = manager->getSM( cmd.bus, cmd.addr, cmd.values[0], cmd.values[1] );
 					if	( rc == -1 )
 						return	( Messages.error( 421 ) );
 					return	( Messages.info( cmd.bus, cmd.addr, cmd.values[0], rc ));
@@ -82,7 +82,7 @@ char* SRCPSession::dispatch(char* args, int length )
 					return (Messages.ok());
 
 				case SM:
-					manager->setSM( cmd.bus, cmd.addr, cmd.values[0], cmd.values[1] );
+					manager->setSM( cmd.bus, cmd.addr, cmd.values[0], cmd.values[1], cmd.values[2] );
 					return (Messages.ok());
 
 				default:
@@ -179,7 +179,8 @@ void SRCPSession::parse( char* args, int length )
 				break;
 
 			case	SM:
-				sscanf( args, "%*s %*d %*s %*d %*s %d %d", &cmd.values[0], &cmd.values[1] );
+				sscanf( args, "%*s %*d %*s %*d %s %d %d", d, &cmd.values[1], &cmd.values[2] );
+				cmd.values[0] = getDevice( d );		// Device an welche der SM Befehle geschickt wird.
 				break;
 
 			// GL, GA
@@ -200,7 +201,8 @@ void SRCPSession::parse( char* args, int length )
 		switch	( cmd.device )
 		{
 			case SM:
-				sscanf( args, "%*s %*d %*s %*d %*s %d", &cmd.values[0] );
+				sscanf( args, "%*s %*d %*s %*d %s %d", d, &cmd.values[1] );
+				cmd.values[0] = getDevice( d ); // betrifft Device bzw. SM Befehl fuer Device
 				break;
 		}
 	}
@@ -228,6 +230,9 @@ devices SRCPSession::getDevice( char* device )
 		return	( GL );
 	else if	( strncasecmp(device, "SM", 2) == 0 )
 		return	( SM );
+	// Pseudo Device - Konfigurationsvariablen abfragen
+	else if	( strncasecmp(device, "CV", 2) == 0 )
+		return	( CV );
 
 	return	( NA );
 }

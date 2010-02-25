@@ -68,14 +68,14 @@ void I2CGLMaster::setPower( int on )
 	I2CUtil::write( this->addr, buf, sizeof(buf) );
 }
 
-int I2CGLMaster::setSM( int bus, int addr, int cv, int value )
+int I2CGLMaster::setSM( int bus, int addr, int device, int cv, int value )
 {
-	return	( I2CUtil::setSM( this->addr, bus, addr, cv, value ) );
+	return	( I2CUtil::setSM( this->addr, bus, addr, device, cv, value ) );
 }
 
-int I2CGLMaster::getSM( int bus, int addr, int cv )
+int I2CGLMaster::getSM( int bus, int addr, int device, int cv )
 {
-	return	( I2CUtil::getSM( this->addr, bus, addr, cv ) );
+	return	( I2CUtil::getSM( this->addr, bus, addr, device, cv ) );
 }
 
 }

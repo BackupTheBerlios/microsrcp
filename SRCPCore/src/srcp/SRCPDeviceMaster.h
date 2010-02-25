@@ -96,8 +96,8 @@ public:
 	void refresh();
 	int getFB( int addr );
 	void setPower( int on );
-	int setSM( int bus, int addr, int cv, int value );
-	int getSM( int bus, int addr, int cv );
+	int setSM( int bus, int addr, int device, int cv, int value );
+	int getSM( int bus, int addr, int device, int cv );
 	int getMyAddr() { return ( Storage.read( CV_ID ) ); }
 };
 

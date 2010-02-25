@@ -37,8 +37,8 @@ public:
 	int checkAddr( int addr ) { return ( addr >= startAddr && addr <= endAddr); }
 	int set( int addr, int drivemode, int v, int v_max, int fn[] );
 	void setPower( int on );
-	int setSM( int bus, int addr, int cv, int value );
-	int getSM( int bus, int addr, int cv );
+	int setSM( int bus, int addr, int device, int cv, int value );
+	int getSM( int bus, int addr, int device, int cv );
 };
 
 }
