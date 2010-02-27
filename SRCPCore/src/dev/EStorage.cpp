@@ -20,7 +20,6 @@
  */
 
 #include "EStorage.h"
-#include "../srcp/SRCPCommand.h"
 #include <WProgram.h>
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
@@ -35,45 +34,12 @@ void dev::EStorage::init(srcp::device_config_t deviceConfig[], int id, int versi
 	// Board oder Version-Nr. gewechselt = Storage frisch initialisieren
 	if	( read(CV_BOARD) != id || read(CV_VERSION) != version || read(CV_PRODUCER) == CV_PRODUCER )
 	{
-		int pos = 1;
-		for ( int i = 0; deviceConfig[i].start_addr != -1; i++ )
-		{
-			// Abhandlung Array
-			if	( deviceConfig[i].device == srcp::FB_ARRAY || deviceConfig[i].device == srcp::GA_ARRAY || deviceConfig[i].device == srcp::GL_ARRAY )
-			{
-				int size = deviceConfig[i].args[0];
-				int step = deviceConfig[i].end_addr - deviceConfig[i].start_addr + 1;
-				if	( deviceConfig[i].device == srcp::FB_ARRAY )
-					deviceConfig[i].device = srcp::FB;
-				else if	( deviceConfig[i].device == srcp::GA_ARRAY )
-					deviceConfig[i].device = srcp::GA;
-				else if	( deviceConfig[i].device == srcp::GL_ARRAY )
-				{
-					deviceConfig[i].device = srcp::GL;
-					step = 0; // abgehandelte Adressen bleibt bei GL gleich
-				}
-				for	( unsigned int a = 1; a < sizeof(deviceConfig[i].args); a++ )
-					deviceConfig[i].args[a-1] = deviceConfig[i].args[a];
-				deviceConfig[i].args[sizeof(deviceConfig[i].args)-1] = 0;
-				for	( int s = 0; s < size; s++ )
-				{
-					writeConfig( pos, deviceConfig[i] );
-					deviceConfig[i].start_addr += step;
-					deviceConfig[i].end_addr   += step;
-					deviceConfig[i].args[0]++;
-					pos++;
-				}
-			}
-			// einzelne Device
-			else
-			{
-				writeConfig( pos, deviceConfig[i] );
-				pos++;
-			}
-		}
+		int i = 0;
+		for ( ; deviceConfig[i].start_addr != -1; i++ )
+			writeConfig( i+1, deviceConfig[i] );
 
 		// EOF explizit schreiben!
-		int cv = pos * (sizeof(srcp::device_config_t) + 2);
+		int cv = (i + 1) * (sizeof(srcp::device_config_t) + 2);
 		for	( unsigned int ii = 0; ii < (sizeof(srcp::device_config_t) + 2); ii++ )
 			write( cv+ii, 255 );
 
