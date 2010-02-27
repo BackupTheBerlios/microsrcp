@@ -86,7 +86,7 @@ int I2CDeviceManager::createProxy( srcp::device_config_t config, srcp::SRCPGener
 	Serial << "search I2C bus" << endl;
 #endif
 
-	for	( int i = 3; i < 10; i++ )
+	for	( int i = 1; i < 128; i++ )
 	{
 		int board = I2CUtil::getSM( i, 0, 0, srcp::CV, CV_BOARD );
 		// kein I2C Board auf dieser Adresse vorhanden?
