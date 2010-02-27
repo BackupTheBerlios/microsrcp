@@ -43,6 +43,8 @@ public:
 	virtual void setPower( int on ) {}
 	virtual int setSM( int bus, int addr, int device, int cv, int value ) { return( 200 ); }
 	virtual int getSM( int bus, int addr, int device, int cv ) { return( -1 ); };
+	virtual int	getStartAddr() { return( this->addr ); };
+	virtual int getEndAddr() { return( this->addr ); }
 };
 }
 

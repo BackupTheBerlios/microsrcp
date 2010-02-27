@@ -57,10 +57,12 @@ protected:
 public:
 	SRCPFeedback* nextElement() { return ( next ); }
 	void setNextElement( SRCPFeedback* next ) { this->next = next; }
-	virtual int checkAddr( int addr ) { return( addr >= this->addr && addr <= (this->addr+8)  ); }
+	virtual int checkAddr( int addr ) { return( addr >= this->addr && addr <= (this->addr+8-1)  ); }
 	virtual void refresh() {};
 	virtual int info( int addr, feedback fb[] );
 	virtual uint8_t get( int addr ) { oldSensor = sensor; sensor = 0; return ( oldSensor); }
+	virtual int	getStartAddr() { return( this->addr ); };
+	virtual int getEndAddr() { return( this->addr + 8-1 ); }
 };
 }
 

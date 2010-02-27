@@ -42,6 +42,8 @@ public:
 	int set( int addr, int drivemode, int v, int v_max, int fn[] );
 	int checkAddr( int addr ) { return ( addr >= startAddr && addr <= endAddr); }
 	void setPower( int on );
+	int	getStartAddr() { return( this->startAddr ); };
+	int getEndAddr() { return( this->endAddr ); }
 };
 
 }

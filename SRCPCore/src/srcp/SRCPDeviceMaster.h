@@ -98,6 +98,7 @@ public:
 	void setPower( int on );
 	int setSM( int bus, int addr, int device, int cv, int value );
 	int getSM( int bus, int addr, int device, int cv );
+	int getDescription( int bus, int addr, int device, int rc[] );
 	int getMyAddr() { return ( Storage.read( CV_ID ) ); }
 };
 

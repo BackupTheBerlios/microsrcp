@@ -23,6 +23,9 @@
 #define I2CDEVICEMANAGER_H_
 
 #include "../srcp/SRCPDeviceManager.h"
+#include "../srcp/SRCPGenericAccessoire.h"
+#include "../srcp/SRCPGenericLoco.h"
+#include "../srcp/SRCPFeedback.h"
 
 namespace i2c
 {
@@ -34,6 +37,7 @@ public:
 	srcp::SRCPGenericAccessoire* createGA( srcp::device_config_t config, srcp::SRCPGenericAccessoire* next );
 	srcp::SRCPGenericLoco* createGL( srcp::device_config_t config, srcp::SRCPGenericLoco* next );
 	srcp::SRCPFeedback* createFB( srcp::device_config_t config, srcp::SRCPFeedback* next );
+	int createProxy( srcp::device_config_t config, srcp::SRCPGenericAccessoire **ga, srcp::SRCPGenericLoco **gl, srcp::SRCPFeedback **fb );
 };
 
 }

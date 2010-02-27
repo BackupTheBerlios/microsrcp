@@ -24,6 +24,11 @@
 #include "I2CGAMaster.h"
 #include "I2CGLMaster.h"
 #include "I2CFBMaster.h"
+#include "I2CUtil.h"
+
+#include "../srcp/SRCPCommand.h"
+#include "../srcp/SRCPDeviceMaster.h"
+#include "../dev/EStorage.h"
 
 namespace i2c
 {
@@ -63,6 +68,102 @@ srcp::SRCPFeedback* I2CDeviceManager::createFB( srcp::device_config_t config, sr
 			break;
 	}
 	return	( 0 );
+}
+
+int I2CDeviceManager::createProxy( srcp::device_config_t config, srcp::SRCPGenericAccessoire **ga, srcp::SRCPGenericLoco **gl, srcp::SRCPFeedback **fb )
+{
+	int stepFB = config.args[0];
+	int stepGA = config.args[1];
+	int nextFB = 1;
+	int nextGA = 1;
+	union
+	{
+		uint8_t byte[12];
+		int values[6];
+	} buf;
+
+#if	( DEBUG_SCOPE > 1 )
+	Serial << "search I2C bus" << endl;
+#endif
+
+	for	( int i = 3; i < 10; i++ )
+	{
+		int board = I2CUtil::getSM( i, 0, 0, srcp::CV, CV_BOARD );
+		// kein I2C Board auf dieser Adresse vorhanden?
+		if	( board == -1 )
+		{
+			// Platzhalter 8 Adressen freihalten
+			nextFB += stepFB;
+			nextGA += stepGA;
+			continue;
+		}
+		int rc = I2CUtil::getDescription( i, 0, 0, srcp::LAN, buf.byte );
+		if	( rc == -1 )
+			continue;
+#if	( DEBUG_SCOPE > 1 )
+			Serial << "I2C addr:id: " << i << ":" << board << ", fb: " << nextFB << " " << buf.values[0] << "-" << buf.values[1] <<
+					", ga: " << nextGA << " " << buf.values[2] << "-" << buf.values[3] <<
+					", gl: " << buf.values[4] << "-" << buf.values[5] << endl;
+#endif
+		switch	( board )
+		{
+			// DCC Boards haben fixe Adressen
+			case srcp::BOARD_DCC:
+				// GA Geraete vorhanden
+				if	( buf.values[2] > 0 && buf.values[3] > 0 )
+				{
+					config.subDevice = srcp::I2CGAMaster;
+					config.start_addr = buf.values[2];
+					config.end_addr = buf.values[3];
+					config.args[0] = i;
+					*ga = createGA( config, *ga );
+				}
+				// GL Geraete vorhanden
+				if	( buf.values[4] > 0 && buf.values[5] > 0 )
+				{
+					config.subDevice = srcp::I2CGLMaster;
+					config.start_addr = buf.values[4];
+					config.end_addr = buf.values[5];
+					config.args[0] = i;
+					*gl = createGL( config, *gl );
+				}
+				break;
+
+			default:
+				// FB Geraete vorhanden
+				if	( buf.values[0] > 0 && buf.values[1] > 0 )
+				{
+					config.subDevice = srcp::I2CFBMaster;
+					config.start_addr = nextFB;
+					config.end_addr = nextFB + buf.values[1] - buf.values[0] + 1;
+					config.args[0] = i;
+					*fb = createFB( config, *fb );
+					nextFB = config.end_addr;
+				}
+				// GA Geraete vorhanden
+				if	( buf.values[2] > 0 && buf.values[3] > 0 )
+				{
+					config.subDevice = srcp::I2CGAMaster;
+					config.start_addr = nextGA;
+					config.end_addr = nextGA +  + buf.values[3] - buf.values[2] + 1;
+					config.args[0] = i;
+					*ga = createGA( config, *ga );
+					nextGA = config.end_addr;
+				}
+				// GL (analoge) Geraete vorhanden
+				if	( buf.values[4] > 0 && buf.values[5] > 0 )
+				{
+					config.subDevice = srcp::I2CGLMaster;
+					config.start_addr = buf.values[4];
+					config.end_addr = buf.values[5];
+					config.args[0] = i;
+					*gl = createGL( config, *gl );
+				}
+				break;
+		}
+	}
+
+	return	( 1 );
 }
 
 }

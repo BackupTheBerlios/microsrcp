@@ -40,6 +40,7 @@ public:
 	virtual SRCPGenericAccessoire* createGA( device_config_t config, SRCPGenericAccessoire* next ) { return(0); }
 	virtual SRCPGenericLoco* createGL( device_config_t config, SRCPGenericLoco* next ) { return(0); }
 	virtual SRCPFeedback* createFB( device_config_t config, SRCPFeedback* next ) { return(0); }
+	virtual int createProxy( device_config_t config, SRCPGenericAccessoire **ga, SRCPGenericLoco **gl, SRCPFeedback **fb ) { return(0); }
 	void setNextManager( SRCPDeviceManager *next ) { this->next = next; }
 	SRCPDeviceManager* getNextManager() { return ( next ); }
 };

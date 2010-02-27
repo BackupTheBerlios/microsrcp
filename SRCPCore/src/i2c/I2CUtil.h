@@ -38,6 +38,7 @@ public:
 	static int read( int addr, uint8_t *buf, int size );
 	static int setSM( int remoteAddr, int bus, int addr, int device, int cv, int value );
 	static int getSM( int remoteAddr, int bus, int addr, int device, int cv );
+	static int getDescription( int remoteAddr, int bus, int addr, int device, uint8_t *rc );
 };
 
 }

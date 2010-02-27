@@ -40,6 +40,8 @@ public:
 	GAOpenDCC( int startAddr, int endAddr, srcp::SRCPGenericAccessoire* next );
 	int set( int addr, int port, int value, int delay );
 	int checkAddr( int addr ) { return ( addr >= startAddr && addr <= endAddr); }
+	int	getStartAddr() { return( this->startAddr ); };
+	int getEndAddr() { return( this->endAddr ); }
 };
 
 }

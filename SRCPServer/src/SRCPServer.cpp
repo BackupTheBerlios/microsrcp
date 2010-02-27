@@ -37,30 +37,15 @@
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 241 };
 
-#define VERSION 11		// Version x.y
+#define VERSION 22		// Version x.y
 
 // Definition der I2C Boards - muss fuer weitere Boards erweitert werden.
 srcp::device_config_t deviceConfig[] =
 	{
-		////////////////////// Board 1 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
-		// 6 Servo und 2 Lichtsignale
-		{ 1, 8, srcp::GA_ARRAY, srcp::I2CGAMaster, { 10, 1 } },
-		// 8 Rueckmelder
-		{ 1, 8, srcp::FB_ARRAY, srcp::I2CFBMaster, { 10, 1 } },
-
-		////////////////////// Board 90 - 92 - Abspielen von Wave Dateien /////////////
-		// Die SRCP Adressen 100 - 199 werden an I2C Board 90 weitergeleitet
-		{ 100, 199, srcp::GA_ARRAY, srcp::I2CGAMaster, { 3, 90 } },
-
-		////////////////////// Board 99 - OpenDCC //////////////////////////////////////////////////
-		// Loks mit der SRCP Adresse 10 bis 9999 werden an I2C Board 99 weitergeleitet
-		{ 10, 9999, srcp::GL_ARRAY, srcp::I2CGLMaster, { 5, 95 } },
-		// Zubehoer mit der SRCP Adresse 1 und 999 werden an I2C Board 99 weitergeleitet
-		{  1,  999, srcp::GA, srcp::I2CGAMaster, { 99 } },
-
-		////////////////////// Board 100 - Motorentreiber //////////////////////////////////////////
-		// Loks mit der SRCP Adresse 3 und 4 werden an I2C Board 100 weitergeleitet
-		{ 3, 4, srcp::GL, srcp::I2CGLMaster, { 100 } },
+		// alle Geraete werden im I2C Netzwerk gesucht und anhand der gefunden
+		// I2C Boards eingetragen. Pro fehlendes Geraete (FB, GA) werden 8 Adressen
+		// reserviert.
+		{ 1, 9999, srcp::LAN, srcp::I2CDESCRIPTION, { 8, 8 } },
 
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
@@ -72,12 +57,14 @@ void setup()
 	Serial.begin( 19200 );
 #endif
 
+	// initialize I2C - Master braucht keine Adresse, muss als erstes erfolgen
+	// sonst kann der I2C Bus nicht durchsucht werden.
+	i2c::I2CUtil::begin( 0 );
+
 	//EthernetServer.addDeviceManager( &CoreDevices );
 	EthernetServer.addDeviceManager( new i2c::I2CDeviceManager() );
 	EthernetServer.begin( mac, ip, 4303, deviceConfig, srcp::BOARD_CPU, VERSION );
 
-	// initialize I2C - Master braucht keine Adresse
-	i2c::I2CUtil::begin( 0 );
 
 #if	( DEBUG_SCOPE > 0 )
 	Serial << "Server setup i.o. " << endl;

@@ -44,7 +44,7 @@ namespace srcp
  */
 
 	enum commands { GET, SET, GO, CONNECTIONMODE, CHECK, WAIT, INIT, TERM, RESET, VERIFY, PROTOCOL, UNKNOWN };
-	enum devices { POWER, FB, GA, GL, SM, CV, NA };
+	enum devices { POWER, FB, GA, GL, SM, DESCRIPTION, CV, LAN, NA };
 
 	struct command_t
 	{
@@ -62,6 +62,7 @@ namespace srcp
 	enum GADevices { I2CGAMaster, GADCC, GASignal, GAServo, GAWave, GA_EOF };
 	enum GLDevices { I2CGLMaster, GLDCC, GLAnalog293, GLAFMotor, GLArduinoMotor, GL_EOF };
 	enum FBDevices { I2CFBMaster, FBS88 /* reserviert */, FBSwitchSensor, FB_EOF  };
+	enum LANDevices { I2CDESCRIPTION, LAN_EOF };
 
 	struct	device_config_t
 	{

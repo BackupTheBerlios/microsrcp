@@ -27,10 +27,14 @@ extern "C" {
 #include "twi.h"
 #include <string.h>
 }
+#if	( DEBUG_SCOPE > 2 )
+#include <WProgram.h>
+#endif
 
 #include <wiring.h>
 #include "I2CUtil.h"
 #include "../srcp/SRCPCommand.h"
+
 
 namespace i2c
 {
@@ -44,6 +48,10 @@ void I2CUtil::begin( int addr = 0 )
 
 int I2CUtil::write( int addr, uint8_t *buf, int size )
 {
+#if	( DEBUG_SCOPE > 2 )
+		Serial << "send to: " << addr << ", args " << (int) buf[0] << ":"  << (int) buf[1]
+				<< ", size " << size << endl;
+#endif
 	// mehrmals versuchen ob Kommunikation klappt - evtl. muss auf den Bus gewartet werden.
 	for ( int i = 0; i < 3; i++ )
 	{
@@ -113,6 +121,30 @@ int I2CUtil::getSM( int remoteAddr, int bus, int addr, int device, int cv )
 		return	( -1 );
 
 	return	( buf[0] );
+}
+
+int I2CUtil::getDescription( int remoteAddr, int bus, int addr, int device, uint8_t* rc )
+{
+	uint8_t buf[6];
+	buf[0] = srcp::DESCRIPTION;
+	buf[1] = srcp::GET;
+	int a = 0;
+	// nicht Board Eeprom aendern?
+	if	( bus != 0 )
+		a = addr;
+	memcpy( &buf[2], &a, 2 );
+	buf[4] = bus;
+	buf[5] = device;
+
+	int r = I2CUtil::write( remoteAddr, buf, sizeof(buf) );
+	if	( r != 200 )
+		return	( -1 );
+
+	r = I2CUtil::read( remoteAddr, rc, 12 );
+	if	( r != 200 )
+		return	( -1 );
+
+	return	( 200 );
 }
 
 }

@@ -142,6 +142,16 @@ int I2CServer::dispatchTx()
 				case srcp::SM:
 					cmd.args[0] = manager->getSM( cmd.values[0], cmd.addr, cmd.values[1], cmd.values[2] );
 					return ( 1 );
+
+				case srcp::DESCRIPTION:
+				{
+					int size = manager->getDescription( cmd.values[0], cmd.addr, cmd.values[1], cmd.values );
+#if	( DEBUG_SCOPE > 2 )
+	Serial << "description: fb " << cmd.values[0] << "-" << cmd.values[1] << ", ga " << cmd.values[2]
+	       << "-" << cmd.values[3] << ", gl " << cmd.values[4] << "-" << cmd.values[5] << endl;
+#endif
+					return	( size );
+				}
 				default:
 					break;
 			}
