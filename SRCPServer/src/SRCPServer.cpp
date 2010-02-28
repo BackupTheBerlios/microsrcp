@@ -28,24 +28,26 @@
 #include "WProgram.h"
 #include "lan/EthernetSRCPServer.h"
 
+#include "srcp/SRCPCommand.h"
 #include "srcp/SRCPDeviceMaster.h"
 #include "dev/CoreDeviceManager.h"
 #include "i2c/I2CDeviceManager.h"
 #include "i2c/I2CUtil.h"
+#include "dev/EStorage.h"
 
 #include "shell/SRCPShell.h"
 
-// network configuration.  gateway and subnet are optional.
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = { 192, 168, 1, 241 };
-
-#define VERSION 22		// Version x.y
+#define VERSION 12		// Version x.y
 
 // Definition der I2C Boards - muss fuer weitere Boards erweitert werden.
 srcp::device_config_t deviceConfig[] =
 	{
+		// Platzhalter damit IP, Port mittels EEPROM verwaltet werden koennen
+		{ 0, 0, srcp::LAN, srcp::IP,      { 192, 168, 1, 241 } },
+		{ 0, 0, srcp::LAN, srcp::SRCP_PORT, { 16, 207 } },	// 4303/256 + 4303%256 = 4303
+
 		// alle Geraete werden im I2C Netzwerk gesucht und anhand der gefunden
-		// I2C Boards eingetragen. Pro fehlendes Geraete (FB, GA) werden 8 Adressen
+		// I2C Boards eingetragen. Pro I2C Adresse ohne Board (FB, GA) werden 8 Adressen
 		// reserviert.
 		{ 1, 9999, srcp::LAN, srcp::I2CDESCRIPTION, { 8, 8 } },
 
@@ -63,13 +65,17 @@ void setup()
 
 	//EthernetServer.addDeviceManager( &CoreDevices );
 	EthernetServer.addDeviceManager( new i2c::I2CDeviceManager() );
-	EthernetServer.begin( mac, ip, 4303, deviceConfig, srcp::BOARD_CPU, VERSION );
+	srcp::device_config_t config = Storage.getConfig( 2 );
+	int port = config.args[0] * 256 + config.args[1];
+	config = Storage.getConfig( 1 );
+	EthernetServer.begin( config.args, port, deviceConfig, srcp::BOARD_CPU, VERSION );
 
 	// Shell braucht Zugriff auf Geraete und eine SRCP Session
 	Shell.begin( EthernetServer.getDevices(), EthernetServer.getSession() );
 
 #if	( DEBUG_SCOPE > 0 )
-	Serial << "Server setup i.o. " << endl;
+	Serial << "Server listen " << (int) config.args[0] << "." << (int) config.args[1] << "."
+		   << (int) config.args[2] << "." << (int) config.args[3] << ":" << port << endl;
 #endif
 }
 

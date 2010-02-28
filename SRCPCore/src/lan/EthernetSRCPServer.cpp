@@ -45,6 +45,8 @@ namespace lan
 char command[64];
 int pos = 0;
 long last = millis();
+// network configuration.  gateway and subnet are optional.
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 
 EthernetSRCPServer::EthernetSRCPServer()
 {
@@ -54,12 +56,14 @@ EthernetSRCPServer::EthernetSRCPServer()
 	infoSRCPSession = new srcp::SRCPSession( devices );
 }
 
-void EthernetSRCPServer::begin( byte mac[], byte ip[], int port, srcp::device_config_t deviceConfig[], int id, int version )
+void EthernetSRCPServer::begin( byte ip[], int port, srcp::device_config_t deviceConfig[], int id, int version )
 {
 	commandSocket = new ServerSocket( port );
 	infoSocket = new ServerSocket( port );
 
 	// initialize the ethernet device
+	// trick: letzte Stelle IP-Adresse wird fuer MAC Adresse verwendet, verhindert gleiche MAC-Adressen.
+	mac[5] = ip[3];
 	Ethernet.begin( mac, ip );
 	commandSocket->begin();
 	infoSocket->begin();
