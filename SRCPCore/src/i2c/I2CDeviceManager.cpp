@@ -82,7 +82,7 @@ int I2CDeviceManager::createProxy( srcp::device_config_t config, srcp::SRCPGener
 		int values[6];
 	} buf;
 
-#if	( DEBUG_SCOPE > 1 )
+#if	( DEBUG_SCOPE > 0 )
 	Serial << "search I2C bus" << endl;
 #endif
 
@@ -100,7 +100,7 @@ int I2CDeviceManager::createProxy( srcp::device_config_t config, srcp::SRCPGener
 		int rc = I2CUtil::getDescription( i, 0, 0, srcp::LAN, buf.byte );
 		if	( rc == -1 )
 			continue;
-#if	( DEBUG_SCOPE > 1 )
+#if	( DEBUG_SCOPE > 0 )
 			Serial << "I2C addr:id: " << i << ":" << board << ", fb: " << nextFB << " " << buf.values[0] << "-" << buf.values[1] <<
 					", ga: " << nextGA << " " << buf.values[2] << "-" << buf.values[3] <<
 					", gl: " << buf.values[4] << "-" << buf.values[5] << endl;
