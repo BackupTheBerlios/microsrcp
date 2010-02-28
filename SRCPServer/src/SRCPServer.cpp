@@ -33,7 +33,7 @@
 #include "dev/CoreDeviceManager.h"
 #include "i2c/I2CDeviceManager.h"
 #include "i2c/I2CUtil.h"
-#include "dev/EStorage.h"
+#include "cp/EStorage.h"
 
 #include "shell/SRCPShell.h"
 

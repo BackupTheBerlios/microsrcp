@@ -26,7 +26,7 @@
 #include <srcp/SRCPFeedback.h>
 #include <srcp/SRCPGenericAccessoire.h>
 #include <srcp/SRCPGenericLoco.h>
-#include <dev/EStorage.h>
+#include <cp/EStorage.h>
 #include <i2c/I2CUtil.h>
 
 // Preinstantiate Objects //////////////////////////////////////////////////////

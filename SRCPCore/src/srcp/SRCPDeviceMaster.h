@@ -41,7 +41,7 @@
 
 #include "SRCPCommand.h"
 #include "SRCPDeviceManager.h"
-#include "../dev/EStorage.h"
+#include "../cp/EStorage.h"
 
 namespace srcp
 {

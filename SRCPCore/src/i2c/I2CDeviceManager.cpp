@@ -28,7 +28,6 @@
 
 #include "../srcp/SRCPCommand.h"
 #include "../srcp/SRCPDeviceMaster.h"
-#include "../dev/EStorage.h"
 
 namespace i2c
 {

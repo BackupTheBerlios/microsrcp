@@ -24,12 +24,12 @@
 
 // Preinstantiate Objects //////////////////////////////////////////////////////
 
-dev::EStorage Storage = dev::EStorage();
+cp::EStorage Storage = cp::EStorage();
 
-namespace dev
+namespace cp
 {
 
-void dev::EStorage::init(srcp::device_config_t deviceConfig[], int id, int version)
+void EStorage::init(srcp::device_config_t deviceConfig[], int id, int version)
 {
 	// Board oder Version-Nr. gewechselt = Storage frisch initialisieren
 	if	( read(CV_BOARD) != id || read(CV_VERSION) != version || read(CV_PRODUCER) == CV_PRODUCER )
@@ -51,7 +51,7 @@ void dev::EStorage::init(srcp::device_config_t deviceConfig[], int id, int versi
 	}
 }
 
-srcp::device_config_t dev::EStorage::getConfig(int addr)
+srcp::device_config_t EStorage::getConfig(int addr)
 {
 	srcp::device_config_t device;
 
@@ -69,7 +69,7 @@ srcp::device_config_t dev::EStorage::getConfig(int addr)
 	return	( device );
 }
 
-void dev::EStorage::writeConfig(int addr, srcp::device_config_t device )
+void EStorage::writeConfig(int addr, srcp::device_config_t device )
 {
 	// Startadresse Parameter
 	int cv = addr * (sizeof(srcp::device_config_t) + 2);

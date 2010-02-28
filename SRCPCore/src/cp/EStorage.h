@@ -25,7 +25,7 @@
 #include <EEPROM.h>
 #include "../srcp/SRCPCommand.h"
 
-namespace dev
+namespace cp
 {
 
 #define CV_ID 			1
@@ -49,6 +49,6 @@ public:
 
 }
 
-extern dev::EStorage Storage;
+extern cp::EStorage Storage;
 
 #endif /* ESTORAGE_H_ */

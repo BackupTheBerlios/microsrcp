@@ -103,7 +103,6 @@
  */
 
 #include "SRCPDeviceMaster.h"
-#include "../dev/EStorage.h"
 #include "../i2c/I2CUtil.h"
 
 namespace srcp
