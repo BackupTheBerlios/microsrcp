@@ -72,6 +72,10 @@ srcp::SRCPFeedback* I2CDeviceManager::createFB( srcp::device_config_t config, sr
 
 int I2CDeviceManager::createProxy( srcp::device_config_t config, srcp::SRCPGenericAccessoire **ga, srcp::SRCPGenericLoco **gl, srcp::SRCPFeedback **fb )
 {
+	// alle nicht I2C Board Proxies ignorieren
+	if	( config.subDevice != srcp::I2CDESCRIPTION )
+		return( 0 );
+
 	int stepFB = config.args[0];
 	int stepGA = config.args[1];
 	int nextFB = 1;
