@@ -33,6 +33,8 @@
 #include "i2c/I2CDeviceManager.h"
 #include "i2c/I2CUtil.h"
 
+#include "shell/SRCPShell.h"
+
 // network configuration.  gateway and subnet are optional.
 byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 byte ip[] = { 192, 168, 1, 241 };
@@ -53,9 +55,7 @@ srcp::device_config_t deviceConfig[] =
 
 void setup()
 {
-#if	( DEBUG_SCOPE > 0 )
 	Serial.begin( 19200 );
-#endif
 
 	// initialize I2C - Master braucht keine Adresse, muss als erstes erfolgen
 	// sonst kann der I2C Bus nicht durchsucht werden.
@@ -65,6 +65,8 @@ void setup()
 	EthernetServer.addDeviceManager( new i2c::I2CDeviceManager() );
 	EthernetServer.begin( mac, ip, 4303, deviceConfig, srcp::BOARD_CPU, VERSION );
 
+	// Shell braucht Zugriff auf Geraete und eine SRCP Session
+	Shell.begin( EthernetServer.getDevices(), EthernetServer.getSession() );
 
 #if	( DEBUG_SCOPE > 0 )
 	Serial << "Server setup i.o. " << endl;
@@ -74,6 +76,7 @@ void setup()
 void loop()
 {
 	EthernetServer.run();
+	Shell.run();
 	delay( 15 );
 }
 
