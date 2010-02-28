@@ -23,14 +23,15 @@
  */
 
 #include <AF_Wave.h>
-#include "wave.h"
+#include <wave.h>
 
+#include <EEPROM.h>
+#include <EStorage.h>
 #include <SRCPDeviceMaster.h>
-#include "WaveDeviceManager.h"
-#include "I2CServer.h"
+#include <WaveDeviceManager.h>
+#include <I2CServer.h>
 
-// Meine I2C Adresse, muss fuer weitere Boards angepasst werden.
-#define MY_ADDR	90
+#define VERSION 10	// Version 1.0
 
 // Definition der lokalen Geraete
 srcp::device_config_t deviceConfig[] =
@@ -47,11 +48,16 @@ srcp::device_config_t deviceConfig[] =
 
 void setup()
 {
+#if	( DEBUG_SCOPE > 0 )
 	Serial.begin( 19200 ); // set up Serial library at 9600 bps
-	Serial.println( "Wave test!" );
+#endif
 
 	WireServer.addDeviceManager( new wav::WaveDeviceManager() );
-	WireServer.begin( MY_ADDR, deviceConfig );
+	WireServer.begin( deviceConfig, srcp::BOARD_WAVE, VERSION );
+
+#if	( DEBUG_SCOPE > 0 )
+	Serial << "Wave listen " <<  WireServer.getMyAddr() << endl;
+#endif
 }
 
 void loop()

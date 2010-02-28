@@ -21,14 +21,18 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+ 
+// Debugginginformationen einschalten, braucht Streaming.h, siehe ReadMe.txt 
+// #define  DEBUG_SCOPE 2 
 
 #include <Servo.h>
+#include <EEPROM.h>
+#include <EStorage.h>
 #include <I2CServer.h>
 #include <SRCPDeviceMaster.h>
 #include <CoreDeviceManager.h>
 
-// Meine I2C Adresse
-#define MY_ADDR	100
+#define VERSION 10	// Version 1.0
 
 // Definition der lokalen Geraete
 srcp::device_config_t deviceConfig[] =
@@ -43,10 +47,16 @@ srcp::device_config_t deviceConfig[] =
 
 void setup()
 {
-  // Devicemanager fuer lokale Geraete (Sensoren, Servos etc.) initialisieren
-  WireServer.addDeviceManager( new dev::CoreDeviceManager() );
-  // I2C Server starten
-  WireServer.begin( MY_ADDR, deviceConfig );
+#if	( DEBUG_SCOPE > 0 )
+	Serial.begin(19200);
+#endif
+
+	WireServer.addDeviceManager( new dev::CoreDeviceManager() );
+	WireServer.begin( deviceConfig, srcp::BOARD_GL, VERSION );
+
+#if	( DEBUG_SCOPE > 0 )
+	Serial << "GL listen " <<  WireServer.getMyAddr() << endl;
+#endif
 }
 
 void loop()

@@ -22,46 +22,35 @@
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+ 
+// Debugginginformationen einschalten, braucht Streaming.h, siehe ReadMe.txt 
+// #define  DEBUG_SCOPE 2 
 
 #include <stddef.h>
+#include <EEPROM.h>
 #include <Servo.h>
 #include <Ethernet.h>
+#include <EStorage.h>
 #include <I2CUtil.h>
 #include <I2CDeviceManager.h>
 #include <SRCPDeviceMaster.h>
 #include <EthernetSRCPServer.h>
 #include <ServerSocket.h>
-#include <CoreDeviceManager.h>
+#include <SRCPShell.h>
 
-
-// network configuration.  gateway and subnet are optional.
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-byte ip[] = { 192, 168, 1, 241 };
+#define VERSION 12		// Version x.y
 
 // Definition der I2C Boards - muss fuer weitere Boards erweitert werden.
 srcp::device_config_t deviceConfig[] =
 	{
-		////////////////////// Board 1 - Universal (Servos, Lichtsignale, Rueckmelder) /////////////
-		// Die SRCP Adressen 32 - 63 werden an I2C Board 1 weitergeleitet
-		{ 32, 63, srcp::GA, srcp::I2CGAMaster, { 1 } },
-		// Die SRCP Adressen 64 - 96 werden an I2C Board 1 weitergeleitet
-		{ 64, 96, srcp::GA, srcp::I2CGAMaster, { 1 } },
-		// Die SRCP Rueckmelder 1 - 8 befinden sich auf I2C Board 1
-		{ 1, 8, srcp::FB, srcp::I2CFBMaster, { 1 } },
+		// Platzhalter damit IP, Port mittels EEPROM verwaltet werden koennen
+		{ 0, 0, srcp::LAN, srcp::IP,      { 192, 168, 1, 241 } },
+		{ 0, 0, srcp::LAN, srcp::SRCP_PORT, { 16, 207 } },	// 4303/256 + 4303%256 = 4303
 
-		////////////////////// Board 90 - 92 - Abspielen von Wave Dateien /////////////
-		// Die SRCP Adressen 100 - 199 werden an I2C Board 90 weitergeleitet
-		{ 100, 199, srcp::GA, srcp::I2CGAMaster, { 90 } },
-
-		////////////////////// Board 99 - OpenDCC //////////////////////////////////////////////////
-		// Loks mit der SRCP Adresse 10 bis 9999 werden an I2C Board 99 weitergeleitet
-		{ 10, 9999, srcp::GL, srcp::I2CGLMaster, { 99 } },
-		// Zubehoer mit der SRCP Adresse 1 und 999 werden an I2C Board 99 weitergeleitet
-		{  1,  999, srcp::GA, srcp::I2CGAMaster, { 99 } },
-
-		////////////////////// Board 100 - Motorentreiber //////////////////////////////////////////
-		// Loks mit der SRCP Adresse 3 und 4 werden an I2C Board 100 weitergeleitet
-		{ 3, 4, srcp::GL, srcp::I2CGLMaster, { 100 } },
+		// alle Geraete werden im I2C Netzwerk gesucht und anhand der gefunden
+		// I2C Boards eingetragen. Pro I2C Adresse ohne Board (FB, GA) werden 8 Adressen
+		// reserviert.
+		{ 1, 9999, srcp::LAN, srcp::I2CDESCRIPTION, { 8, 8 } },
 
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
@@ -69,19 +58,31 @@ srcp::device_config_t deviceConfig[] =
 
 void setup()
 {
-  EthernetServer.addDeviceManager( new i2c::I2CDeviceManager() );
-  EthernetServer.begin( mac, ip, 4303, deviceConfig );
+	Serial.begin( 19200 );
 
-  // initialize I2C
-  i2c::I2CUtil::begin( 0 );
+	// initialize I2C - Master braucht keine Adresse, muss als erstes erfolgen
+	// sonst kann der I2C Bus nicht durchsucht werden.
+	i2c::I2CUtil::begin( 0 );
+
+	//EthernetServer.addDeviceManager( &CoreDevices );
+	EthernetServer.addDeviceManager( new i2c::I2CDeviceManager() );
+	srcp::device_config_t config = Storage.getConfig( 2 );
+	int port = config.args[0] * 256 + config.args[1];
+	config = Storage.getConfig( 1 );
+	EthernetServer.begin( config.args, port, deviceConfig, srcp::BOARD_CPU, VERSION );
+
+	// Shell braucht Zugriff auf Geraete und eine SRCP Session
+	Shell.begin( EthernetServer.getDevices(), EthernetServer.getSession() );
+
+	Serial << "Server listen " << (int) config.args[0] << "." << (int) config.args[1] << "."
+		   << (int) config.args[2] << "." << (int) config.args[3] << ":" << port << endl;
 }
 
 void loop()
 {
-  // Empfaengt SRCP Befehle via TCP/IP, leitet diese via I2C weiter, fragt Rueckmelder via I2C ab.
-  EthernetServer.run();
-  // Hier gibt es noch Raum fuer Erweiterungen
-  delay( 15 );
+	EthernetServer.run();
+	Shell.run();
+	delay( 15 );
 }
 
 

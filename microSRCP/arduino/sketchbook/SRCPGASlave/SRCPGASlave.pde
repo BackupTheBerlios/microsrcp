@@ -23,24 +23,28 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
  
+// Debugginginformationen einschalten, braucht Streaming.h, siehe ReadMe.txt 
+// #define  DEBUG_SCOPE 2
+
 #include <Servo.h>
+#include <EEPROM.h>
+#include <EStorage.h>
 #include <I2CServer.h>
 #include <SRCPDeviceMaster.h>
 #include <CoreDeviceManager.h>
 
-// Meine I2C Adresse, muss fuer weitere Boards angepasst werden.
-#define MY_ADDR	1
+#define VERSION 11	// Version x.y der EEPROM Daten
 
-// Definition der lokalen Geraete
+// Definition der lokalen Geraete - 1. Version, als Arduino Shield aufgebaut.
 srcp::device_config_t deviceConfig[] =
 	{
-		// lokale Adresse 1, Servo an Pin 0, Servoradius von 60 - 120 verwenden.
-		{ 1, 0, srcp::GA, srcp::GAServo , {0, 60, 120} },	// Servo Pin 0 - 5
-		{ 2, 0, srcp::GA, srcp::GAServo , {1, 60, 120} },
-		{ 3, 0, srcp::GA, srcp::GAServo , {2, 60, 120} },
-		{ 4, 0, srcp::GA, srcp::GAServo , {3, 60, 120} },
-		{ 5, 0, srcp::GA, srcp::GAServo , {4, 60, 120} },
-		{ 6, 0, srcp::GA, srcp::GAServo , {5, 60, 120} },
+		// lokale Adresse 1, Servo an Pin 0, Servoradius von 87 - 93 (Mittelstellung) verwenden.
+		{ 1, 0, srcp::GA, srcp::GAServo , {0, 87, 93} },	// Servo Pin 0 - 5
+		{ 2, 0, srcp::GA, srcp::GAServo , {1, 87, 93} },
+		{ 3, 0, srcp::GA, srcp::GAServo , {2, 87, 93} },
+		{ 4, 0, srcp::GA, srcp::GAServo , {3, 87, 93} },
+		{ 5, 0, srcp::GA, srcp::GAServo , {4, 87, 93} },
+		{ 6, 0, srcp::GA, srcp::GAServo , {5, 87, 93} },
 		// lokale Adresse 1 bis 8, Rueckmelder an Pins 6 - 12
 		{ 1, 8, srcp::FB, srcp::FBSwitchSensor, { 6, 12 } },	// Sensoren Pin 6 - 12, 13 = LED
 		// lokale Adresse 7, Lichtsignal, Rot an Pin 14, Gruen an Pin 15.
@@ -52,8 +56,16 @@ srcp::device_config_t deviceConfig[] =
 
 void setup()
 {
+#if	( DEBUG_SCOPE > 0 )
+	Serial.begin(19200);
+#endif
+
 	WireServer.addDeviceManager( new dev::CoreDeviceManager() );
-	WireServer.begin( MY_ADDR, deviceConfig );
+	WireServer.begin( deviceConfig, srcp::BOARD_GA, VERSION );
+
+#if	( DEBUG_SCOPE > 0 )
+	Serial << "GA listen " <<  WireServer.getMyAddr() << endl;
+#endif
 }
 
 void loop()
