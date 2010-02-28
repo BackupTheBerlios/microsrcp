@@ -42,6 +42,7 @@ public:
 	virtual int getSM( int bus, int addr, int device, int cv ) { return( -1 ); };
 	virtual int	getStartAddr() { return( this->addr ); };
 	virtual int getEndAddr() { return( this->addr ); }
+	virtual int getAddr() { return( this->addr ); }
 };
 }
 

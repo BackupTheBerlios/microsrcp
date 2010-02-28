@@ -63,6 +63,7 @@ public:
 	virtual uint8_t get( int addr ) { oldSensor = sensor; sensor = 0; return ( oldSensor); }
 	virtual int	getStartAddr() { return( this->addr ); };
 	virtual int getEndAddr() { return( this->addr + 8-1 ); }
+	virtual int getAddr() { return( this->addr ); }
 };
 }
 

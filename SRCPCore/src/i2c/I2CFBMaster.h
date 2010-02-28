@@ -37,6 +37,8 @@ public:
 	int checkAddr( int addr ) { return ( addr >= startAddr && addr <= endAddr); }
 	void refresh() { /* wird vom Slave erledigt */ }
 	int info( int addr, srcp::feedback fb[] );
+	int	getStartAddr() { return( this->startAddr ); };
+	int getEndAddr() { return( this->endAddr ); }
 };
 
 }
