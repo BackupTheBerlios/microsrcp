@@ -22,6 +22,13 @@
 
 #include "SRCPShell.h"
 
+#include <srcp/SRCPCommand.h>
+#include <srcp/SRCPFeedback.h>
+#include <srcp/SRCPGenericAccessoire.h>
+#include <srcp/SRCPGenericLoco.h>
+#include <dev/EStorage.h>
+#include <i2c/I2CUtil.h>
+
 // Preinstantiate Objects //////////////////////////////////////////////////////
 shell::SRCPShell Shell = shell::SRCPShell();
 
@@ -47,8 +54,7 @@ void SRCPShell::run()
 		{
 			cmd[pos] = '\0';
 			Serial << endl;
-			char *rc = session->dispatch( cmd );
-			Serial << rc << '\r';
+			dispatch( cmd );
 			pos = 0;
 			break;
 		}
@@ -69,6 +75,68 @@ void SRCPShell::run()
 		}
 	}
 }
+
+void SRCPShell::dispatch( char *cmd )
+{
+	// Geraete am I2C Bus ausgeben
+	if	( strncasecmp(cmd, "I2C", 3) == 0 || strncasecmp(cmd, "TWI", 3) == 0 )
+	{
+		union
+		{
+			uint8_t byte[12];
+			int values[6];
+		} buf;
+
+		for	( int i = 1; i < 128; i++ )
+		{
+			int board = i2c::I2CUtil::getSM( i, 0, 0, srcp::CV, CV_BOARD );
+			// kein I2C Board auf dieser Adresse vorhanden?
+			if	( board == -1 )
+				continue;
+			int rc = i2c::I2CUtil::getDescription( i, 0, 0, srcp::LAN, buf.byte );
+			if	( rc == -1 )
+				continue;
+				Serial << "I2C addr:id: " << i << ":" << board << ", fb: " << buf.values[0] << "-" << buf.values[1] <<
+						", ga: " << buf.values[2] << "-" << buf.values[3] <<
+						", gl: " << buf.values[4] << "-" << buf.values[5] << endl;
+		}
+	}
+	// Devices ausgeben
+	else if ( strncasecmp(cmd, "DEV", 3) == 0 )
+	{
+		for	( srcp::SRCPFeedback* n = devices->firstFeedbackElement(); n != 0; n = n->nextElement() )
+			Serial << "FB " << n->getStartAddr() << "-" << n->getEndAddr() << endl;
+		for	( srcp::SRCPGenericAccessoire* n = devices->firstGAElement(); n != 0; n = n->nextElement() )
+			Serial << "GA " << n->getStartAddr() << "-" << n->getEndAddr() << endl;
+		for	( srcp::SRCPGenericLoco* n = devices->firstGLElement(); n != 0; n = n->nextElement() )
+			Serial << "GL" << n->getStartAddr() << "-" << n->getEndAddr() << endl;
+	}
+	// EEPROM ausgeben
+	else if ( strncasecmp(cmd, "ROM", 3) == 0 )
+	{
+		for ( int i = 1; ; i++ )
+		{
+			srcp::device_config_t device = Storage.getConfig( i );
+			// EOF
+			if	( device.start_addr == -1 )
+				break;
+
+			Serial << "EEPROM pos: " << i * (sizeof(srcp::device_config_t) + 2) << ", dev: " << (int) device.device << ":"
+				   << (int) device.subDevice << ", addr " << device.start_addr << " - " << device.end_addr << ", args: ";
+			for	( unsigned int i = 0; i < sizeof(device.args); i++ )
+				Serial << (int) device.args[i] << " ";
+			Serial << endl;
+		}
+
+	}
+	// SRCP Befehl abarbeiten
+	else
+	{
+		char *rc = session->dispatch( cmd );
+		Serial << rc << '\r';
+	}
+}
+
 }
 
 

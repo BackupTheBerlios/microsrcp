@@ -73,10 +73,8 @@ void setup()
 	// Shell braucht Zugriff auf Geraete und eine SRCP Session
 	Shell.begin( EthernetServer.getDevices(), EthernetServer.getSession() );
 
-#if	( DEBUG_SCOPE > 0 )
 	Serial << "Server listen " << (int) config.args[0] << "." << (int) config.args[1] << "."
 		   << (int) config.args[2] << "." << (int) config.args[3] << ":" << port << endl;
-#endif
 }
 
 void loop()

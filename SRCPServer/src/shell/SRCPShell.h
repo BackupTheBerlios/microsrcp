@@ -36,6 +36,7 @@ private:
 	unsigned int pos;
 	srcp::SRCPDeviceMaster *devices;
 	srcp::SRCPSession *session;
+	void dispatch( char *cmd );
 public:
 	void begin( srcp::SRCPDeviceMaster *devices, srcp::SRCPSession *session );
 	void run();
