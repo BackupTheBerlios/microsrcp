@@ -64,6 +64,8 @@ public:
 	void addDeviceManager( srcp::SRCPDeviceManager* manager ) { devices->addDeviceManager( manager ); }
 	void begin( byte mac[], byte ip[], int port, srcp::device_config_t deviceConfig[], int id, int version );
 	void run();
+	srcp::SRCPDeviceMaster* getDevices() { return ( devices ); }
+	srcp::SRCPSession* getSession() { return( srcpSession ); }
 
 	virtual ~EthernetSRCPServer();
 };
