@@ -29,18 +29,18 @@
 #include "dev/CoreDeviceManager.h"
 #include "i2c/I2CServer.h"
 
-#define VERSION 10	// Version 1.0
+#define VERSION 13	// Version x.y der EEPROM Daten
 
-// Definition der lokalen Geraete - 1. Version, als Arduino Shield aufgebaut.
+/*// Definition der lokalen Geraete - 1. Version, als Arduino Shield aufgebaut.
 srcp::device_config_t deviceConfig[] =
 	{
-		// lokale Adresse 1, Servo an Pin 0, Servoradius von 60 - 120 verwenden.
-		{ 1, 0, srcp::GA, srcp::GAServo , {0, 60, 120} },	// Servo Pin 0 - 5
-		{ 2, 0, srcp::GA, srcp::GAServo , {1, 60, 120} },
-		{ 3, 0, srcp::GA, srcp::GAServo , {2, 60, 120} },
-		{ 4, 0, srcp::GA, srcp::GAServo , {3, 60, 120} },
-		{ 5, 0, srcp::GA, srcp::GAServo , {4, 60, 120} },
-		{ 6, 0, srcp::GA, srcp::GAServo , {5, 60, 120} },
+		// lokale Adresse 1, Servo an Pin 0, Servoradius von 87 - 93 (Mittelstellung) verwenden.
+		{ 1, 0, srcp::GA, srcp::GAServo , {0, 87, 93} },	// Servo Pin 0 - 5
+		{ 2, 0, srcp::GA, srcp::GAServo , {1, 87, 93} },
+		{ 3, 0, srcp::GA, srcp::GAServo , {2, 87, 93} },
+		{ 4, 0, srcp::GA, srcp::GAServo , {3, 87, 93} },
+		{ 5, 0, srcp::GA, srcp::GAServo , {4, 87, 93} },
+		{ 6, 0, srcp::GA, srcp::GAServo , {5, 87, 93} },
 		// lokale Adresse 1 bis 8, Rueckmelder an Pins 6 - 12
 		{ 1, 8, srcp::FB, srcp::FBSwitchSensor, { 6, 12 } },	// Sensoren Pin 6 - 12, 13 = LED
 		// lokale Adresse 7, Lichtsignal, Rot an Pin 14, Gruen an Pin 15.
@@ -48,27 +48,27 @@ srcp::device_config_t deviceConfig[] =
 		{ 8, 0, srcp::GA, srcp::GASignal, {16, 17} },
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
-};
+};*/
 
-/*// Definition der lokalen Geraete - 2. Version, minimale Bausteine (Resonator, 10K, Atmega328P)
+// Definition der lokalen Geraete - 2. Version, minimale Bausteine (Resonator, 10K, Atmega328P)
 // aufgebaut auf Laborkarte RE315 von Roth Elektronik. Kein Arduino Standard Board mehr!
 srcp::device_config_t deviceConfig[] =
 	{
-		// lokale Adresse 1, Servo an Pin 0, Servoradius von 60 - 120 verwenden.
-		{ 1, 0, srcp::GA, srcp::GAServo , {9, 90, 120} },	// Servo Pin D9 und D0 - D4
-		{ 2, 0, srcp::GA, srcp::GAServo , {0, 90, 120} },
-		{ 3, 0, srcp::GA, srcp::GAServo , {1, 90, 120} },
-		{ 4, 0, srcp::GA, srcp::GAServo , {2, 90, 120} },
-		{ 5, 0, srcp::GA, srcp::GAServo , {3, 90, 120} },
-		{ 6, 0, srcp::GA, srcp::GAServo , {4, 90, 120} },
-		// lokale Adresse 1 bis 8, Rueckmelder an Pins 6 - 12
-		{ 1, 8, srcp::FB, srcp::FBSwitchSensor, { 10, 17 } },	// Sensoren Pin D10 - D13 und C0 - C3
+		// lokale Adresse 1, Servo an Pin 0, Servoradius von 87 - 93 (Mittelstellung) verwenden.
+		{ 1, 0, srcp::GA, srcp::GAServo , {9, 87, 93} },	// Servo Pin D9 und D0 - D4
+		{ 2, 0, srcp::GA, srcp::GAServo , {0, 87, 93} },
+		{ 3, 0, srcp::GA, srcp::GAServo , {1, 87, 93} },
+		{ 4, 0, srcp::GA, srcp::GAServo , {2, 87, 93} },
+		{ 5, 0, srcp::GA, srcp::GAServo , {3, 87, 93} },
+		{ 6, 0, srcp::GA, srcp::GAServo , {4, 87, 93} },
 		// lokale Adresse 7, Lichtsignal
 		{ 7, 0, srcp::GA, srcp::GASignal, {5, 6} },		// Signale Pin D5 + D6 und D7 + D8
 		{ 8, 0, srcp::GA, srcp::GASignal, {7, 8} },
+		// lokale Adresse 1 bis 8, Rueckmelder an Pins 6 - 12
+		{ 1, 8, srcp::FB, srcp::FBSwitchSensor, { 10, 17 } },	// Sensoren Pin D10 - D13 und C0 - C3
 		// EOF Geraete - nicht vergessen!
 		{ -1 },
-};*/
+};
 
 void setup()
 {
