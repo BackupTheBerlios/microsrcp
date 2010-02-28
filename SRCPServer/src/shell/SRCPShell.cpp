@@ -42,20 +42,23 @@ void SRCPShell::run()
 	{
 		int c = Serial.read();
 
-		// \r loest Abarbeitung Befehl aus
-		if	( c == '\r' )
+		// \r, \n oder ; loest Abarbeitung Befehl aus
+		if	( c == '\r' || c == '\n' || c == ';' )
 		{
 			cmd[pos] = '\0';
 			Serial << endl;
 			char *rc = session->dispatch( cmd );
-			Serial << "rc :" << rc << '\r';
+			Serial << rc << '\r';
 			pos = 0;
 			break;
 		}
 		if	( c == '\b' || c == 127 )
 		{
 			if	( pos > 0 )
+			{
 				pos--;
+				Serial << (char) c;
+			}
 			continue;
 		}
 		if	( pos < sizeof(cmd) )
