@@ -126,6 +126,14 @@ void SRCPDeviceMaster::init( device_config_t deviceConfig[], int id, int version
 		if	( device.start_addr == -1 )
 			break;
 
+#if	( DEBUG_SCOPE > 0 )
+		Serial << "EEPROM pos: " << i * (sizeof(srcp::device_config_t) + 2) << ", dev: " << device.device << ":"
+			   << (int) device.subDevice << ", addr " << device.start_addr << " - " << device.end_addr << ", args: ";
+		for	( unsigned int i = 0; i < sizeof(device.args); i++ )
+			Serial << (int) device.args[i] << " ";
+		Serial << endl;
+#endif
+
 		switch ( device.device )
 		{
 			case GA:
