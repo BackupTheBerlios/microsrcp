@@ -78,6 +78,7 @@ void SRCPShell::run()
 
 void SRCPShell::dispatch( char *cmd )
 {
+#if ( DEBUG_SCOPE == 0 )
 	// Geraete am I2C Bus ausgeben
 	if	( strncasecmp(cmd, "I2C", 3) == 0 || strncasecmp(cmd, "TWI", 3) == 0 )
 	{
@@ -105,11 +106,11 @@ void SRCPShell::dispatch( char *cmd )
 	else if ( strncasecmp(cmd, "DEV", 3) == 0 )
 	{
 		for	( srcp::SRCPFeedback* n = devices->firstFeedbackElement(); n != 0; n = n->nextElement() )
-			Serial << "FB " << n->getStartAddr() << "-" << n->getEndAddr() << endl;
+			Serial << "FB " << n->getAddr() << " " << n->getStartAddr() << "-" << n->getEndAddr() << endl;
 		for	( srcp::SRCPGenericAccessoire* n = devices->firstGAElement(); n != 0; n = n->nextElement() )
-			Serial << "GA " << n->getStartAddr() << "-" << n->getEndAddr() << endl;
+			Serial << "GA " << n->getAddr() << " " << n->getStartAddr() << "-" << n->getEndAddr() << endl;
 		for	( srcp::SRCPGenericLoco* n = devices->firstGLElement(); n != 0; n = n->nextElement() )
-			Serial << "GL" << n->getStartAddr() << "-" << n->getEndAddr() << endl;
+			Serial << "GL " << n->getAddr() << " " << n->getStartAddr() << "-" << n->getEndAddr() << endl;
 	}
 	// EEPROM ausgeben
 	else if ( strncasecmp(cmd, "ROM", 3) == 0 )
@@ -131,6 +132,7 @@ void SRCPShell::dispatch( char *cmd )
 	}
 	// SRCP Befehl abarbeiten
 	else
+#endif
 	{
 		char *rc = session->dispatch( cmd );
 		Serial << rc << '\r';
