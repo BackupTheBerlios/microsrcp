@@ -24,13 +24,10 @@
 
  */
 
-
-#include "WProgram.h"
 #include "lan/EthernetSRCPServer.h"
 
 #include "srcp/SRCPCommand.h"
 #include "srcp/SRCPDeviceMaster.h"
-#include "dev/CoreDeviceManager.h"
 #include "i2c/I2CDeviceManager.h"
 #include "i2c/I2CUtil.h"
 #include "cp/EStorage.h"
