@@ -14,7 +14,7 @@ Und patch/AF_Wave in hardware/libraries/AF_Wave kopieren
 nachdem die AF_Wave Library dorthin kopiert wurde!
 (umschliesst wave.h mit #ifdef #endif).
 
-skeetbook-Verzeichnis Inhalte in Arduino Skeetbook-
+skeetbook-ZIP-Datei entpacken und Inhalte in Arduino Skeetbook-
 Verzeichnis kopieren. (siehe File -> Preferences in der 
 Arduino IDE).
 
@@ -28,12 +28,8 @@ Die RocRail SRCP Zentrale kann einfach mittels dem
 User-Interface erstellt werden, dannach noch host= in
 rocrail.ini anpassen und fertig.
 
-Die Datei plan.xml ist abgestimmt mit den Beispiel
-Sketches. 
-
-Servos mit Pin 2 und 3, Lichtsignale mit Analog 0/1 und
-2/3 verbinden, Sensoren koennen an die Pins 6 - 12 
-angeschlossen werden. 
+Die .xml Dateien sind ausgesuchte Beispiele welche
+in microSRCP.odt beschrieben sind.
 
 Copyright
 ---------

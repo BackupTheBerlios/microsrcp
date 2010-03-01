@@ -1,0 +1,122 @@
+<plan title="planpsa.xml" rocguiversion="1.2.4 revision 225" rocrailversion="1.2.4 revision 225">
+  <zlevel title="Pendelzugstrecke analog" z="0" active="true"/>
+  <tklist>
+    <tk type="straight" id="tk20100301170043875" x="3" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170044890" x="4" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170044375" x="5" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170045031" x="6" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170045562" x="7" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170046937" x="8" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170046343" x="9" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170047765" x="10" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170047156" x="11" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170047531" x="12" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170048906" x="13" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170048281" x="14" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170048656" x="15" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170049046" x="16" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170049453" x="17" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170050953" x="18" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170051359" x="19" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170052765" x="20" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170052187" x="21" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170053796" x="22" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170053187" x="24" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170054734" x="23" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170054593" x="25" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170055500" x="26" y="1" z="0"/>
+    <tk type="curve" id="tk20100301170058890" x="27" y="1" z="0"/>
+    <tk type="straight" id="tk20100301170101000" x="27" y="2" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170103093" x="27" y="3" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170104875" x="27" y="4" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170104468" x="27" y="5" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170105000" x="27" y="6" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170106390" x="27" y="7" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170107468" x="27" y="8" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170108484" x="27" y="9" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170109312" x="27" y="10" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170110125" x="27" y="11" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170138734" x="26" y="12" z="0"/>
+    <tk type="curve" id="tk20100301170141937" x="27" y="12" z="0" ori="south"/>
+    <tk type="straight" id="tk20100301170239687" x="24" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170241968" x="23" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170242703" x="22" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170242296" x="21" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170243890" x="20" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170243484" x="19" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170244093" x="18" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170245703" x="17" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170246921" x="16" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170246500" x="15" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170247000" x="14" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170247593" x="13" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170248500" x="12" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170249062" x="11" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170250843" x="10" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170250296" x="9" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170251875" x="8" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170251546" x="7" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170252359" x="6" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170253921" x="4" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170254875" x="5" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170256437" x="14" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170258078" x="22" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170259781" x="17" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170259625" x="16" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170300312" x="15" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170352250" x="13" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170353062" x="12" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170354718" x="11" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170354265" x="10" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170355437" x="5" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170406625" x="3" y="12" z="0"/>
+    <tk type="straight" id="tk20100301170101000-copy" x="27" y="2" z="0" ori="north" copy="true"/>
+    <tk type="straight" id="tk20100301170432453" x="2" y="2" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170433656" x="2" y="3" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170435031" x="2" y="4" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170436875" x="2" y="5" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170438734" x="2" y="6" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170438281" x="2" y="7" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170440484" x="2" y="8" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170441000" x="2" y="9" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170442765" x="2" y="10" z="0" ori="north"/>
+    <tk type="straight" id="tk20100301170442406" x="2" y="11" z="0" ori="north"/>
+    <tk type="curve" id="tk20100301170702453" x="2" y="12" z="0" ori="east"/>
+    <tk type="curve" id="tk20100301170715593" x="2" y="1" z="0" ori="north"/>
+    <tk type="curve" id="tk20100301170734625" x="25" y="13" z="0" ori="south"/>
+    <tk type="straight" id="tk20100301170743078" x="3" y="13" z="0"/>
+    <tk type="straight" id="tk20100301170744062" x="2" y="13" z="0"/>
+  </tklist>
+  <swlist>
+    <sw type="left" id="Weiche1" x="25" y="12" z="0" switched="0" prev_id="Weiche1" blockid="" accnr="1" savepos="none" dir="false" swtype="default" road="false" ori="west" iid="" bus="0" addr1="1" port1="17" gate1="0" inv="false" singlegate="false" addr2="0" port2="0" inv2="false" actdelay="false" delay="0" prot="D" fbRinv="false" fbGinv="false" fb2Rinv="false" fb2Ginv="false" state="straight">
+      <accessoryctrl active="false" interval="0" delay="0" lockroutes=""/>
+    </sw>
+  </swlist>
+  <fblist>
+    <fb id="Sensor1" x="23" y="13" z="0" prev_id="Sensor1" desc="" show="true" road="false" curve="false" blockid="" routeids="" ori="west" iid="" bus="0" addr="17" activelow="false" state="false" identifier="0"/>
+    <fb id="Sensor2" x="4" y="13" z="0" prev_id="Sensor2" desc="" show="true" road="false" curve="false" blockid="" routeids="" ori="west" iid="" bus="0" addr="18" activelow="false" state="false" identifier="0"/>
+  </fblist>
+  <bklist>
+    <bk id="BlockA" x="18" y="13" z="0" state="open" reserved="false" prev_id="BlockA" desc="" len="0" electrified="false" station="false" gomanual="true" acceptghost="false" terminalstation="false" wait="true" road="false" allowchgdir="true" commuter="no" turnouts="" ttid="" signal="" wsignal="" signalR="" wsignalR="" speed="cruise" exitspeed="cruise" type="none" incline="0" waitmode="random" minwaittime="1" maxwaittime="30" waittime="10" mvscale="87" mvdistance="0" mvmph="false" evttimer="0" iid="" addr="0" port="0" td="false" entering="false" locid="">
+      <fbevent id="Sensor1" action="enter2in" from="BlockB" endpuls="false" ghostdetection="false"/>
+    </bk>
+    <bk id="BlockB" x="6" y="13" z="0" state="open" reserved="false" prev_id="BlockB" desc="" len="0" electrified="false" station="false" gomanual="true" acceptghost="false" terminalstation="false" wait="true" road="false" allowchgdir="true" commuter="no" turnouts="" ttid="" signal="" wsignal="" signalR="" wsignalR="" speed="cruise" exitspeed="cruise" type="none" incline="0" waitmode="random" minwaittime="1" maxwaittime="30" waittime="10" mvscale="87" mvdistance="0" mvmph="false" evttimer="0" iid="" addr="0" port="0" td="false" entering="false" locid="Stromkreis 2">
+      <fbevent id="Sensor2" action="enter2in" from="BlockA" endpuls="false" ghostdetection="false"/>
+    </bk>
+  </bklist>
+  <lclist>
+    <lc id="Stromkreis 1" prev_id="NEW" shortid="" roadname="" number="" desc="" image="" remark="" len="0" catnr="" purchased="" runtime="1" identifier="0" show="true" bus="0" addr="3" iid="" prot="P" protver="1" spcnt="28" fncnt="4" V_min="10" V_mid="50" V_max="100" V_Rmin="0" V_Rmid="0" V_Rmax="0" V_step="0" mass="0" V_mode="kmh" placing="true" regulated="false" dirpause="0" blockwaittime="10" evttimer="0" usescheduletime="false" commuter="false" trysamedir="false" tryoppositedir="false" forcesamedir="false" shortin="false" inatpre2in="false" engine="diesel" cargo="none" secondnextblock="false" consist_lightsoff="false" consist="" V="0" fn="true"/>
+    <lc id="Stromkreis 2" prev_id="Stromkreis 2" shortid="" roadname="" number="" desc="" image="" remark="" len="0" catnr="" purchased="" runtime="49" identifier="0" show="true" bus="0" addr="4" iid="" prot="P" protver="1" spcnt="28" fncnt="4" V_min="10" V_mid="50" V_max="100" V_Rmin="0" V_Rmid="0" V_Rmax="0" V_step="0" mass="0" V_mode="kmh" placing="true" regulated="false" dirpause="0" blockwaittime="10" evttimer="0" usescheduletime="false" commuter="false" trysamedir="false" tryoppositedir="false" forcesamedir="false" shortin="false" inatpre2in="false" engine="diesel" cargo="none" secondnextblock="false" consist_lightsoff="false" consist="" cmd="block" blockid="BlockB" V="0" dir="false" fn="true" resumeauto="true" mode="idle"/>
+  </lclist>
+  <sglist>
+    <sg id="Signal1" x="24" y="13" z="0" ori="east" desc="" blockid="" road="false" routeids="" iid="" bus="0" addr="1" addr2="0" addr3="0" addr4="0" port1="23" port2="0" port3="0" port4="0" gate1="0" gate2="0" gate3="0" gate4="0" prot="N" type="light" signal="main" aspects="2" dwarf="false" usepatterns="false" inv="false" pair="false" asswitch="true" green="0" red="0" yellow="0" white="0" state="green"/>
+  </sglist>
+  <stlist>
+    <st id="A-B" prev_id="A-B" bka="BlockA" bkb="BlockB" bkc="" modid="" dir="false" lcdir="true" speed="percent" speedpercent="80" reduceV="false" swap="false" swappost="false"/>
+  </stlist>
+  <txlist>
+    <tx text="Stromkreis 1" id="tx20100301171851687" x="12" y="2" z="0" prev_id="tx20100301171851687" desc="" pointsize="12" bold="false" underlined="false" italic="false" transparent="true" ori="west" cx="3" cy="1" red="0" green="0" blue="0"/>
+    <tx text="Stromkreis 2                        " id="tx20100301171934703" x="12" y="14" z="0" prev_id="tx20100301171934703" desc="" pointsize="12" bold="false" underlined="false" italic="false" transparent="true" ori="west" cx="3" cy="1"/>
+    <tx id="tx20100301171936968" x="29" y="18" z="0"/>
+  </txlist>
+</plan>
