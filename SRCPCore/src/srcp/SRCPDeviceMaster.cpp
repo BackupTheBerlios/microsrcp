@@ -238,7 +238,14 @@ int SRCPDeviceMaster::setSM( int bus, int addr, int device, int cv, int value )
 	{
 		// 8,255 = Reset Chip, Werte im EEPROM bleiben erhalten
 		if	( cv == CV_PRODUCER && value == 255 )
-			asm volatile ("jmp 0x0000");
+		{
+	         __asm__ __volatile
+	                 (
+	                      "ldi r30,0"  "\n\t"
+	                      "ldi r31,0"  "\n\t"
+	                      "icall" "\n\t"
+	                 );
+		}
 
 		Storage.write( cv, value );
 		return	( 200 );
