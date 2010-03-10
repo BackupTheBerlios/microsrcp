@@ -32,7 +32,7 @@ namespace cp
 #define CV_BOARD 		2
 #define CV_VERSION 		7
 #define CV_PRODUCER 	8
-#define PRODUCER_ID		123
+#define PRODUCER_ID		13			// Oeffentliche und Selbstbaudekoder laut JMRI
 
 class EStorage
 {
