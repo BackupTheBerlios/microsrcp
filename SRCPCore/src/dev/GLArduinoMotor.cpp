@@ -43,7 +43,8 @@ GLArduinoMotor::GLArduinoMotor( int addr, uint8_t pin, uint8_t dir, SRCPGenericL
 	pinMode( dir, OUTPUT );
 	digitalWrite( dir, HIGH );
 
-	setPwmFrequency( pin, 1024 );
+	// ohne Funktion?
+	//setPwmFrequency( pin, 1024 );
 	pinMode( pin, OUTPUT );
 }
 
