@@ -48,7 +48,7 @@ extern "C"
 #include "dcc/DCCDeviceManager.h"
 #include "i2c/I2CServer.h"
 
-#define VERSION 11	// Version 1.0
+#define VERSION 19	// Version 1.0
 
 // Definition der lokalen Geraete
 srcp::device_config_t deviceConfig[] =
@@ -80,6 +80,13 @@ void setup()
 
 	init_organizer(); // engine for command repetition, memory of loco speeds and types
 	opendcc_state = RUN_OKAY;
+
+	// Port A Enable an L298N - MotoMama, DCC Signal an Input 1 + 2
+	pinMode( 11, OUTPUT);
+	digitalWrite( 11, HIGH );
+	// Port B Enable an L298N - MotoMama, DCC Signal an Input 3 + 4
+	pinMode( 12, OUTPUT);
+	digitalWrite( 12, HIGH );
 
 #if	( DEBUG_SCOPE > 0 )
 	Serial << "listen " <<  WireServer.getMyAddr() << endl;
