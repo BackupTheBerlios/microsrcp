@@ -57,7 +57,7 @@
   #define EEPROM_SIZE  2048
   #define EEPROM_BASE  0x810000L
 #endif
-#if (__AVR_ATmega1280__)
+#if (__AVR_ATmega1280__ || __AVR_ATmega2560__)
   // atmega644:   4kByte SRAM, 2kByte EEPROM
   #define SRAM_SIZE    8096
   #define EEPROM_SIZE  4096
@@ -78,7 +78,7 @@
 	#define DCC        1     // out
 	#define ENA_PROG   4     // out  high = enable programming
 	#define ENA_MAIN   5     // out  high = enable main
-#elif (__AVR_ATmega1280__)
+#elif (__AVR_ATmega1280__ || __AVR_ATmega2560__)
 	// Port B
 	#define NDCC       6     // out
 	#define DCC        5     // out
@@ -98,7 +98,7 @@
 
 // this results after compile: sbi(PORTB,MY_CTS)
 
-#if (__AVR_ATmega328P__ || __AVR_ATmega1280__)
+#if (__AVR_ATmega328P__ || __AVR_ATmega1280__ || __AVR_ATmega2560__)
 	#define MAIN_TRACK_ON    PORTB |= (1<<ENA_MAIN)
 	#define MAIN_TRACK_OFF   PORTB &= ~(1<<ENA_MAIN)
 	#define MAIN_TRACK_STATE (PINB & (1<<ENA_MAIN)))
